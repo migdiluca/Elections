@@ -14,16 +14,17 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
 
     @Override
     public void openElections() {
-
+        System.out.println("Opening!");
     }
 
     @Override
     public ElectionState getElectionState() {
-        return null;
+        System.out.println(ElectionState.RUNNING);
+        return ElectionState.RUNNING;
     }
 
     @Override
     public void finishElections() {
-
+        System.out.println("Closing!");
     }
 }
