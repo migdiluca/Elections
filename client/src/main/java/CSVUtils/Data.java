@@ -1,4 +1,4 @@
-package Elections.client;
+package CSVUtils;
 
 import Elections.Models.*;
 
@@ -25,7 +25,7 @@ public class Data implements Supplier<List<Vote>> {
             Reader reader = Files.newBufferedReader(path);
             dataList = CSVBean.beanBuilder(reader);
             reader.close();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("An error has been encountered while reading votes file");
             System.err.println("Exiting...");
             System.exit(1);
@@ -40,8 +40,10 @@ public class Data implements Supplier<List<Vote>> {
         long startTime = System.currentTimeMillis();
         List<Vote> votes = getVotes(csvPath).stream()
                 .map(csvBean -> new Vote(csvBean.getTable(),
-                        Arrays.stream(csvBean.getPoliticalPartys().split(",")).map(PoliticalParty::valueOf).collect(Collectors.toList()),
-                        Province.valueOf(csvBean.getProvince()))
+                        csvBean.getPoliticalParties(),
+                        //                Arrays.stream(csvBean.getPoliticalPartys().split(",")).map(PoliticalParty::valueOf).collect(Collectors.toList()),
+                        //                Province.valueOf(csvBean.getProvince()))
+                        csvBean.getProvince())
                 ).collect(Collectors.toList());
         long elapsedTime = System.currentTimeMillis() - startTime;
         System.out.println("====> VOTE LIST Total elapsed: " + elapsedTime);
