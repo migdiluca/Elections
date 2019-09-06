@@ -1,4 +1,4 @@
-package Elections.client.voteClient;
+package Elections.client;
 
 import Elections.Models.*;
 
