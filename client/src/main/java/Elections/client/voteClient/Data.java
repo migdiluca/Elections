@@ -25,8 +25,10 @@ public class Data implements Supplier<List<Vote>> {
             Reader reader = Files.newBufferedReader(path);
             dataList = CSVBean.beanBuilder(reader);
             reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }  catch (Exception e) {
+            System.err.println("An error has been encountered while reading votes file");
+            System.err.println("Exiting...");
+            System.exit(1);
         }
         long elapsedTime = System.currentTimeMillis() - startTime;
         System.out.println("====> OPEN CSV Total elapsed: " + elapsedTime);
@@ -41,10 +43,8 @@ public class Data implements Supplier<List<Vote>> {
                         Arrays.stream(csvBean.getPoliticalPartys().split(",")).map(PoliticalParty::valueOf).collect(Collectors.toList()),
                         Province.valueOf(csvBean.getProvince()))
                 ).collect(Collectors.toList());
-
         long elapsedTime = System.currentTimeMillis() - startTime;
         System.out.println("====> VOTE LIST Total elapsed: " + elapsedTime);
-
         return votes;
     }
 }
