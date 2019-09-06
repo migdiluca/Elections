@@ -4,22 +4,22 @@ import java.util.List;
 
 public class Vote {
 
-    private int tabel;
+    private int table;
     // quizas podria haber otra alternativa mejor para guardar los votos en orden de preferencia
-    private List<PoliticalParty> prefferedParties;
+    private List<PoliticalParty> preferredParties;
     private Province province;
 
-    public Vote(int tabel, List<PoliticalParty> prefferedParties, Province province) {
-        this.tabel = tabel;
-        this.prefferedParties = prefferedParties;
+    public Vote(int table, List<PoliticalParty> preferredParties, Province province) {
+        this.table = table;
+        this.preferredParties = preferredParties;
         this.province = province;
     }
 
     @Override
     public String toString() {
         return "Vote{" +
-                "tabel=" + tabel +
-                ", prefferedParties=" + prefferedParties +
+                "table=" + table +
+                ", preferredParties=" + preferredParties +
                 ", province=" + province +
                 '}';
     }

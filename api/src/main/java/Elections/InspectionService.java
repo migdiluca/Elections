@@ -1,15 +1,23 @@
 package Elections;
 
 
-public interface InspectionService {
+import Elections.Exceptions.AlreadyFinishedElectionException;
+import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsAlreadyStartedException;
+import Elections.Models.PoliticalParty;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface InspectionService extends Remote {
     /**
      * If already open
-     * e@throws ElectionsAlreadyStartedException or
-     * e@throws AlreadyFinishedElectionException (o un nombre mas piolin)
+     * @throws ElectionsAlreadyStartedException or
+     * @throws AlreadyFinishedElectionException
      *
      * hay que ver como implementar el servicio remoto pavisar que hubo un voto
      */
-    void addInspector(/*Party*/int party, int desk);
+    void addInspector(PoliticalParty party, int desk) throws RemoteException, ElectionStateException;
 
 
 }

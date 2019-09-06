@@ -1,11 +1,19 @@
 package Elections;
 
 
-public interface VotingService {
+import Elections.Exceptions.AlreadyFinishedElectionException;
+import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsAlreadyStartedException;
+import Elections.Models.Vote;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface VotingService extends Remote {
     /**
      * If already open
-     * e@throws ElectionsAlreadyStartedException or
-     * e@throws AlreadyFinishedElectionException (o un nombre mas piolin)
+     * @throws ElectionsAlreadyStartedException or
+     * @throws AlreadyFinishedElectionException can be thrown
      */
-    void vote(String vote, int desk);
+    void vote(Vote vote) throws RemoteException, ElectionStateException;
 }
