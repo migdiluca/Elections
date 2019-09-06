@@ -35,8 +35,10 @@ public class Server {
 
         final Registry registry = LocateRegistry.getRegistry();
 
-
-
+        registry.rebind("administration_service", remoteAS);
+        registry.rebind("voting_service", remoteVS);
+        registry.rebind("inspection_service", remoteIS);
+        registry.rebind("consulting_service", remoteAS);
 
     }
 }
