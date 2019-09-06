@@ -4,10 +4,7 @@ import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.InspectionService;
 import Elections.VotingService;
-import Elections.server.ServiceImpl.AdministrationServiceImpl;
-import Elections.server.ServiceImpl.ConsultingServiceImpl;
-import Elections.server.ServiceImpl.InspectionServiceImpl;
-import Elections.server.ServiceImpl.VotingServiceImpl;
+import Elections.server.ServiceImpl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +20,12 @@ public class Server {
     public static void main(String[] args) throws RemoteException {
         logger.info("Elections Server Starting ...");
 
-        AdministrationService as = new AdministrationServiceImpl();
-        VotingService vs = new VotingServiceImpl();
-        InspectionService is = new InspectionServiceImpl();
-        ConsultingService cs = new ConsultingServiceImpl();
+        ElectionPOJO electionState = new ElectionPOJO();
+
+        AdministrationService as = new AdministrationServiceImpl(electionState);
+        VotingService vs = new VotingServiceImpl(electionState);
+        InspectionService is = new InspectionServiceImpl(electionState);
+        ConsultingService cs = new ConsultingServiceImpl(electionState);
 
         final Remote remoteAS = UnicastRemoteObject.exportObject(as, 900);
         final Remote remoteVS = UnicastRemoteObject.exportObject(vs, 901);
@@ -38,7 +37,7 @@ public class Server {
         registry.rebind("administration_service", remoteAS);
         registry.rebind("voting_service", remoteVS);
         registry.rebind("inspection_service", remoteIS);
-        registry.rebind("consulting_service", remoteAS);
+        registry.rebind("consulting_service", remoteCS);
 
     }
 }

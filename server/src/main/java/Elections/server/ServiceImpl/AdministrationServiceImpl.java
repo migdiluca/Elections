@@ -1,6 +1,9 @@
 package Elections.server.ServiceImpl;
 
 import Elections.AdministrationService;
+import Elections.Exceptions.AlreadyFinishedElectionException;
+import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.ElectionState;
 
 import java.rmi.RemoteException;
@@ -8,22 +11,28 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class AdministrationServiceImpl extends UnicastRemoteObject implements AdministrationService {
 
-    public AdministrationServiceImpl() throws RemoteException {
+    private ElectionPOJO electionState;
 
+    public AdministrationServiceImpl(ElectionPOJO electionState) throws RemoteException {
+        this.electionState = electionState;
     }
 
     @Override
-    public void openElections() {
-
+    public void openElections() throws ElectionStateException {
+        if(electionState.getElectionState().equals(ElectionState.FINISHED))
+            throw new AlreadyFinishedElectionException();
+        electionState.setElectionState(ElectionState.RUNNING);
     }
 
     @Override
     public ElectionState getElectionState() {
-        return null;
+        return electionState.getElectionState();
     }
 
     @Override
-    public void finishElections() {
-
+    public void finishElections() throws ElectionStateException {
+        if(electionState.getElectionState().equals(ElectionState.NOT_STARTED))
+            throw new ElectionsNotStartedException();
+        electionState.setElectionState(ElectionState.FINISHED);
     }
 }

@@ -1,6 +1,7 @@
 package Elections.server.ServiceImpl;
 
 
+import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Dimension;
@@ -12,7 +13,10 @@ import java.util.Map;
 
 public class ConsultingServiceImpl extends UnicastRemoteObject implements ConsultingService {
 
-    public ConsultingServiceImpl() throws RemoteException {
+    private ElectionPOJO electionState;
+
+    public ConsultingServiceImpl(ElectionPOJO electionState) throws RemoteException {
+        this.electionState = electionState;
     }
 
     @Override
