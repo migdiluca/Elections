@@ -16,6 +16,8 @@ public class ElectionPOJO {
     }
 
     public void setElectionState(ElectionState electionState) {
+
         this.electionState = electionState;
+
     }
 }
