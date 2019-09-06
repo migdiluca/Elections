@@ -1,20 +1,28 @@
 package Elections;
 
+import Elections.Exceptions.AlreadyFinishedElectionException;
+import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.ElectionState;
 
-public interface AdministrationService {
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface AdministrationService extends Remote {
 
 
     /**
-     * If already finished @throws AlreadyFinishedElectionException (o un nombre mas piolin)
+     * If already finished
+     * @throws AlreadyFinishedElectionException (o un nombre mas piolin)
      */
-    void openElections();
+    void openElections() throws RemoteException;
 
-    ElectionState getElectionState();
+    ElectionState getElectionState() throws RemoteException, ElectionStateException;
 
     /**
-     * If elections did not start @throws ElectionsNotStartedException (o un nombre mas piolin)
+     * If elections did not start
+     * @throws ElectionsNotStartedException (o un nombre mas piolin)
      */
-    void finishElections();
+    void finishElections() throws RemoteException, ElectionStateException;
 
 }
