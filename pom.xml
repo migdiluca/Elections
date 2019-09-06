@@ -16,8 +16,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <slf4j.version>1.7.12</slf4j.version>
     <opencsv.version>4.1</opencsv.version>
+    <args4j.version>2.33</args4j.version>
   </properties>
   <dependencyManagement>
+    <!--Estas dependencias son las que hereden los hijos-->
     <dependencies>
       <dependency>
         <groupId>com.hazelcast</groupId>
@@ -31,14 +33,19 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>args4j</groupId>
+        <artifactId>args4j</artifactId>
+        <version>${args4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.opencsv</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>${opencsv.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <dependency>
-      <groupId>com.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>${opencsv.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
