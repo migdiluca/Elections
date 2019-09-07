@@ -27,13 +27,21 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
     @Override
     public void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException {
         Pair<PoliticalParty, Integer> votePair = new Pair<>(party,table);
-        if(clients.containsKey(votePair)){
-            clients.get(votePair).add(inspectionClient);
-        } else {
-            List<InspectionClient> clientsToNotify = new ArrayList<>();
-            clientsToNotify.add(inspectionClient);
-            clients.put(new Pair<>(party,table),clientsToNotify);
-        }
+
+        clients.computeIfPresent(votePair, (key, clientsList) -> {
+            clientsList.add(inspectionClient);
+            return clientsList;
+        });
+        clients.computeIfAbsent(votePair, clientsList -> new ArrayList<>()).add(inspectionClient);
+
+//      VERSION EN JAVA 7
+//        if(clients.containsKey(votePair)){
+//            clients.get(votePair).add(inspectionClient);
+//        } else {
+//            List<InspectionClient> clientsToNotify = new ArrayList<>();
+//            clientsToNotify.add(inspectionClient);
+//            clients.put(new Pair<>(party,table),clientsToNotify);
+//        }
     }
 
     public void notifyVoteToClients(Vote vote){
