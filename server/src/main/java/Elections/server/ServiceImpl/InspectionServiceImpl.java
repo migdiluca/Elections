@@ -36,16 +36,29 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
         }
     }
 
-    public void notifyVote(Vote vote){
-        for(PoliticalParty politicalParty : vote.getPreferredParties()){
-            List<InspectionClient> clientsToNotify = clients.get(new Pair<PoliticalParty,Integer>(politicalParty, vote.getTable()));
-            for(InspectionClient inspectionClient : clientsToNotify){
+    public void notifyVoteToClients(Vote vote){
+
+        vote.getPreferredParties().forEach(politicalParty -> {
+            List<InspectionClient> clientsToNotify = clients.get(new Pair<>(politicalParty, vote.getTable()));
+            clientsToNotify.forEach(inspectionClient -> {
                 try{
                     inspectionClient.notifyVote();
                 } catch (RemoteException e){
                     System.out.println("Remote exception on server side for InspectionService");
                 }
-            }
-        }
+            });
+        });
+
+//        VERSION EN JAVA 7
+//        for(PoliticalParty politicalParty : vote.getPreferredParties()){
+//            List<InspectionClient> clientsToNotify = clients.get(new Pair<>(politicalParty, vote.getTable()));
+//            for(InspectionClient inspectionClient : clientsToNotify){
+//                try{
+//                    inspectionClient.notifyVote();
+//                } catch (RemoteException e){
+//                    System.out.println("Remote exception on server side for InspectionService");
+//                }
+//            }
+//        }
     }
 }
