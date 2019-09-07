@@ -11,6 +11,7 @@ import javafx.util.Pair;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.AccessException;
@@ -102,14 +103,14 @@ public class QueryClient {
             return;
         }
 
-        List<Pair<Double, PoliticalParty>> results = null;
+        List<Pair<BigDecimal, PoliticalParty>> results = null;
         try {
             if (client.getTable().isPresent()) {
-                results = cs.checkResult(Dimension.DESK);
+                results = cs.checkResultDesk(client.getTable().get());
             } else if (client.getState().isPresent()) {
-                results = cs.checkResult(Dimension.PROVINCE);
+                results = cs.checkResultProvince(client.getState().get());
             } else {
-                results = cs.checkResult(Dimension.NATIONAL);
+                results = cs.checkResultNational();
             }
         } catch (RemoteException e) {
             System.out.println("There was an error retriving results from" + ConsultingService.SERVICE_NAME);

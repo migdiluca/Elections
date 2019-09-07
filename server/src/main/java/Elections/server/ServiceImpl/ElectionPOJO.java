@@ -16,9 +16,9 @@ public class ElectionPOJO {
     private List<Vote> votingList;
     private long[] partialVotes;
 
-    private List<Pair<PoliticalParty,BigDecimal>> nationalFinalResults;
-    private Map<Province,List<Pair<PoliticalParty,BigDecimal>>> provinceFinalResults;
-    private Map<Integer,List<Pair<PoliticalParty,BigDecimal>>> deskFinalResults;
+    private List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults;
+    private Map<Province,List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
+    private Map<Integer,List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
 
     public ElectionPOJO() {
@@ -67,27 +67,27 @@ public class ElectionPOJO {
         this.partialVotes = partialVotes;
     }
 
-    public List<Pair<PoliticalParty, BigDecimal>> getNationalFinalResults() {
+    public List<Pair<BigDecimal, PoliticalParty>> getNationalFinalResults() {
         return nationalFinalResults;
     }
 
-    public void setNationalFinalResults(List<Pair<PoliticalParty, BigDecimal>> nationalFinalResults) {
+    public void setNationalFinalResults(List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults) {
         this.nationalFinalResults = nationalFinalResults;
     }
 
-    public Map<Province, List<Pair<PoliticalParty, BigDecimal>>> getProvinceFinalResults() {
+    public Map<Province, List<Pair<BigDecimal, PoliticalParty>>> getProvinceFinalResults() {
         return provinceFinalResults;
     }
 
-    public void setProvinceFinalResults(Map<Province, List<Pair<PoliticalParty, BigDecimal>>> provinceFinalResults) {
+    public void setProvinceFinalResults(Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults) {
         this.provinceFinalResults = provinceFinalResults;
     }
 
-    public Map<Integer, List<Pair<PoliticalParty, BigDecimal>>> getDeskFinalResults() {
+    public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> getDeskFinalResults() {
         return deskFinalResults;
     }
 
-    public void setDeskFinalResults(Map<Integer, List<Pair<PoliticalParty, BigDecimal>>> deskFinalResults) {
+    public void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
         this.deskFinalResults = deskFinalResults;
     }
 }

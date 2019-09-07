@@ -24,9 +24,9 @@ public interface ConsultingService extends Remote {
      * @throws ElectionsNotStartedException (o un nombre mas piolin)
      * If elections are running, answers must be FPTP else respect each voting.
      */
-    List<Pair<PoliticalParty, BigDecimal>> checkResultNational() throws RemoteException, ElectionStateException;
+    List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException;
 
-    List<Pair<PoliticalParty, BigDecimal>> checkResultProvince(Province province) throws RemoteException, ElectionStateException;
+    List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException;
 
-    List<Pair<PoliticalParty, BigDecimal>> checkResultDesk(int desk) throws RemoteException, ElectionStateException;
+    List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException;
 }

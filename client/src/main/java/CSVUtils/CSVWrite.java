@@ -13,6 +13,7 @@ import javafx.util.Pair;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class CSVWrite {
 
-    public static void writeCsvFromBean(Path path, List<Pair<Double, PoliticalParty>> result) {
+    public static void writeCsvFromBean(Path path, List<Pair<BigDecimal, PoliticalParty>> result) {
         try {
             Writer writer = Files.newBufferedWriter(path);
             ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();

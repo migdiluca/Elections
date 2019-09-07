@@ -23,13 +23,13 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     }
 
     @Override
-    public void vote(int table, List<PoliticalParty> preferredParties, Province province) throws ElectionStateException {
+    public void vote(List<Vote> votes) throws ElectionStateException {
         if (electionState.getElectionState().equals(ElectionState.FINISHED)){
             throw new AlreadyFinishedElectionException();
         }
         else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
             throw new ElectionsNotStartedException();
         }
-        electionState.addToVoteList(new Vote(table,preferredParties,province));
+        votes.forEach(vote -> electionState.addToVoteList(vote));
     }
 }
