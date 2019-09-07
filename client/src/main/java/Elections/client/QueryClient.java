@@ -1,20 +1,28 @@
 package Elections.client;
 
+import CSVUtils.CSVWrite;
 import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Dimension;
+import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
+import javafx.util.Pair;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.AccessException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 public class QueryClient {
 
@@ -67,8 +75,7 @@ public class QueryClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            // todo: no imprimir un stack asi nomas
-            e.printStackTrace();
+            e.getMessage();
             System.exit(1);
         }
 
@@ -85,7 +92,6 @@ public class QueryClient {
         try {
             final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
             cs = (ConsultingService) registry.lookup(ConsultingService.SERVICE_NAME);
-            as = (AdministrationService) registry.lookup("admin");
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
             System.out.println(e.getMessage());
@@ -96,13 +102,14 @@ public class QueryClient {
             return;
         }
 
+        List<Pair<Double, PoliticalParty>> results = null;
         try {
             if (client.getTable().isPresent()) {
-                cs.checkResult(Dimension.DESK);
+                results = cs.checkResult(Dimension.DESK);
             } else if (client.getState().isPresent()) {
-                cs.checkResult(Dimension.PROVINCE);
+                results = cs.checkResult(Dimension.PROVINCE);
             } else {
-                cs.checkResult(Dimension.NATIONAL);
+                results = cs.checkResult(Dimension.NATIONAL);
             }
         } catch (RemoteException e) {
             System.out.println("There was an error retriving results from" + ConsultingService.SERVICE_NAME);
@@ -112,7 +119,7 @@ public class QueryClient {
             System.out.println(e.getMessage());
         }
 
-        // generar csv, todo: falta ver que estructura de datos manejamos
-    }
+        CSVWrite.writeCsvFromBean(Paths.get(client.getVotesFileName()), results);
 
+    }
 }

@@ -30,6 +30,6 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         // arrancamos un nuevo thread que procese la entrada
         // tenemos que hacer un thread pool, estático o dinámico, que se encargue de procesar
         // los votos
-        return true
+        return true;
     }
 }
