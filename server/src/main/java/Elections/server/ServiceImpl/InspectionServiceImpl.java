@@ -9,14 +9,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class InspectionServiceImpl extends UnicastRemoteObject implements InspectionService {
 
+    private ElectionPOJO electionState;
 
-
-    public InspectionServiceImpl(int port) throws RemoteException {
-        super(port);
-    }
-
-    public InspectionServiceImpl() throws RemoteException{
-
+    public InspectionServiceImpl(ElectionPOJO electionState) throws RemoteException {
+        this.electionState = electionState;
     }
 
     @Override

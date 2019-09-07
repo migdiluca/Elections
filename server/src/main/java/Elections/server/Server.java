@@ -4,14 +4,10 @@ import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.InspectionService;
 import Elections.VotingService;
-import Elections.server.ServiceImpl.AdministrationServiceImpl;
-import Elections.server.ServiceImpl.ConsultingServiceImpl;
-import Elections.server.ServiceImpl.InspectionServiceImpl;
-import Elections.server.ServiceImpl.VotingServiceImpl;
+import Elections.server.ServiceImpl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,17 +20,19 @@ public class Server {
 
         logger.info("Elections Server Starting ...");
 
-        AdministrationService as = new AdministrationServiceImpl();
-        VotingService vs = new VotingServiceImpl();
-        InspectionService is = new InspectionServiceImpl();
-        ConsultingService cs = new ConsultingServiceImpl();
+        ElectionPOJO electionState = new ElectionPOJO();
+
+        AdministrationService as = new AdministrationServiceImpl(electionState);
+        VotingService vs = new VotingServiceImpl(electionState);
+        InspectionService is = new InspectionServiceImpl(electionState);
+        ConsultingService cs = new ConsultingServiceImpl(electionState);
 
         final Registry registry = LocateRegistry.createRegistry(port);
 
         registry.rebind(AdministrationService.SERVICE_NAME, as);
         registry.rebind(VotingService.SERVICE_NAME, vs);
-        registry.rebind("inspection_service", is);
-        registry.rebind("consulting_service", cs);
+        registry.rebind(InspectionService.SERVICE_NAME, is);
+        registry.rebind(ConsultingService.SERVICE_NAME, cs);
 
         System.out.println("Server up and running: " + registry);
         System.out.println(as);

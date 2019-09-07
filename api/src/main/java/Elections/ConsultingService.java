@@ -12,6 +12,8 @@ import java.util.Map;
 
 public interface ConsultingService extends Remote {
 
+    String SERVICE_NAME = "consulting_service";
+
     /**
      * If elections did not start
      * @throws ElectionsNotStartedException (o un nombre mas piolin)

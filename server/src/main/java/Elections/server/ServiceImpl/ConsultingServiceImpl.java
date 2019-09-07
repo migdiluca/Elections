@@ -12,12 +12,10 @@ import java.util.Map;
 
 public class ConsultingServiceImpl extends UnicastRemoteObject implements ConsultingService {
 
-    public ConsultingServiceImpl(int port) throws RemoteException {
-        super(port);
-    }
+    private ElectionPOJO electionState;
 
-    public ConsultingServiceImpl() throws RemoteException{
-
+    public ConsultingServiceImpl(ElectionPOJO electionState) throws RemoteException {
+        this.electionState = electionState;
     }
 
     @Override

@@ -20,6 +20,7 @@ public interface VotingService extends Remote {
      * @throws ElectionsAlreadyStartedException or
      * @throws AlreadyFinishedElectionException can be thrown
      * @param votes List with votes to be counted
+     * @return
      */
-    void vote(List<Vote> votes) throws RemoteException, ElectionStateException;
+    boolean vote(List<Vote> votes) throws RemoteException, ElectionStateException;
 }
