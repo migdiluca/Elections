@@ -6,6 +6,7 @@ import Elections.VotingService;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
 
@@ -20,7 +21,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     }
 
     @Override
-    public void vote(Vote vote) throws ElectionStateException {
-
+    public void vote(List<Vote> votes) throws ElectionStateException {
+        System.out.println(votes);
     }
 }

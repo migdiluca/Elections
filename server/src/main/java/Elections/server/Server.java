@@ -12,18 +12,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.Arrays;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
-    private static int port = 8090;
+    private static final int port = 8090;
 
-    public static void main(String[] args) throws RemoteException, NotBoundException {
+    public static void main(String[] args) throws RemoteException {
 
         logger.info("Elections Server Starting ...");
 
@@ -34,8 +31,8 @@ public class Server {
 
         final Registry registry = LocateRegistry.createRegistry(port);
 
-        registry.rebind("administration_service", as);
-        registry.rebind("voting_service", vs);
+        registry.rebind(AdministrationService.SERVICE_NAME, as);
+        registry.rebind(VotingService.SERVICE_NAME, vs);
         registry.rebind("inspection_service", is);
         registry.rebind("consulting_service", cs);
 
