@@ -5,9 +5,13 @@ import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.Dimension;
 import Elections.Models.PoliticalParty;
+import Elections.Models.Province;
+import javafx.util.Pair;
 
+import java.math.BigDecimal;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Map;
 
 public interface ConsultingService extends Remote {
@@ -17,7 +21,9 @@ public interface ConsultingService extends Remote {
      * @throws ElectionsNotStartedException (o un nombre mas piolin)
      * If elections are running, answers must be FPTP else respect each voting.
      */
-    Map<PoliticalParty, Integer> checkResult(Dimension dimension) throws RemoteException, ElectionStateException;
+    List<Pair<PoliticalParty, BigDecimal>> checkResultNational() throws RemoteException, ElectionStateException;
 
+    List<Pair<PoliticalParty, BigDecimal>> checkResultProvince(Province province) throws RemoteException, ElectionStateException;
 
+    List<Pair<PoliticalParty, BigDecimal>> checkResultDesk(int desk) throws RemoteException, ElectionStateException;
 }

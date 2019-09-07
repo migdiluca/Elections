@@ -1,7 +1,10 @@
 package Elections.server.ServiceImpl;
 
 import Elections.AdministrationService;
+import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsNotStartedException;
+import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Vote;
@@ -21,6 +24,12 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
 
     @Override
     public void vote(int table, List<PoliticalParty> preferredParties, Province province) throws ElectionStateException {
-        Vote vote = new Vote(table,preferredParties,province);
+        if (electionState.getElectionState().equals(ElectionState.FINISHED)){
+            throw new AlreadyFinishedElectionException();
+        }
+        else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
+            throw new ElectionsNotStartedException();
+        }
+        electionState.addToVoteList(new Vote(table,preferredParties,province));
     }
 }
