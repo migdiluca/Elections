@@ -9,10 +9,7 @@ import javafx.util.Pair;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class InspectionServiceImpl extends UnicastRemoteObject implements InspectionService {
 
@@ -22,6 +19,7 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
 
     public InspectionServiceImpl(ElectionPOJO electionState) throws RemoteException {
         this.electionState = electionState;
+        clients = new HashMap<>();
     }
 
     @Override
