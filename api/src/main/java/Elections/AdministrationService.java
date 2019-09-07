@@ -15,9 +15,9 @@ public interface AdministrationService extends Remote {
      * If already finished
      * @throws AlreadyFinishedElectionException (o un nombre mas piolin)
      */
-    void openElections() throws RemoteException;
+    void openElections() throws RemoteException, ElectionStateException;
 
-    ElectionState getElectionState() throws RemoteException, ElectionStateException;
+    ElectionState getElectionState() throws RemoteException;
 
     /**
      * If elections did not start
