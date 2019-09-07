@@ -8,7 +8,11 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class AdministrationServiceImpl extends UnicastRemoteObject implements AdministrationService {
 
-    public AdministrationServiceImpl() throws RemoteException {
+    public AdministrationServiceImpl(int port) throws RemoteException {
+        super(port);
+    }
+
+    public AdministrationServiceImpl() throws RemoteException{
 
     }
 

@@ -12,7 +12,12 @@ import java.util.Map;
 
 public class ConsultingServiceImpl extends UnicastRemoteObject implements ConsultingService {
 
-    public ConsultingServiceImpl() throws RemoteException {
+    public ConsultingServiceImpl(int port) throws RemoteException {
+        super(port);
+    }
+
+    public ConsultingServiceImpl() throws RemoteException{
+
     }
 
     @Override

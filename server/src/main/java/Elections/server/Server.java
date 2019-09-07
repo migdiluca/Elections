@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
-    private static final int port = 8090;
+    private static int port = 8090;
 
     public static void main(String[] args) throws RemoteException, NotBoundException {
 
@@ -31,7 +31,6 @@ public class Server {
         VotingService vs = new VotingServiceImpl();
         InspectionService is = new InspectionServiceImpl();
         ConsultingService cs = new ConsultingServiceImpl();
-
 
         final Registry registry = LocateRegistry.createRegistry(port);
 

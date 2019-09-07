@@ -11,7 +11,11 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
 
     //private VotingSingleton vt;
 
-    public VotingServiceImpl() throws RemoteException {
+    public VotingServiceImpl(int port) throws RemoteException {
+        super(port);
+    }
+
+    public VotingServiceImpl() throws RemoteException{
 
     }
 

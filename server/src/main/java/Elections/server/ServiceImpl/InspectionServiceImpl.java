@@ -11,7 +11,11 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
 
 
 
-    public InspectionServiceImpl() throws RemoteException {
+    public InspectionServiceImpl(int port) throws RemoteException {
+        super(port);
+    }
+
+    public InspectionServiceImpl() throws RemoteException{
 
     }
 
