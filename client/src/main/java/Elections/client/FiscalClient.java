@@ -67,7 +67,7 @@ public class FiscalClient implements InspectionClient {
         System.out.println(client.getTable());
 
         try {
-            UnicastRemoteObject.exportObject(client);
+            UnicastRemoteObject.exportObject(client,0);
             Registry registry = LocateRegistry.getRegistry(client.getIp(), 0);
 
             InspectionService server = (InspectionService) registry.lookup("inspection_service");

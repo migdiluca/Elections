@@ -5,6 +5,7 @@ import Elections.InspectionClient;
 import Elections.InspectionService;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Vote;
+import Elections.server.Server;
 import javafx.util.Pair;
 
 import java.rmi.RemoteException;
@@ -19,7 +20,7 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
 
     public InspectionServiceImpl(ElectionPOJO electionState) throws RemoteException {
         this.electionState = electionState;
-        clients = new HashMap<>();
+        clients = Collections.synchronizedMap(new HashMap<>());
     }
 
     @Override
@@ -30,7 +31,7 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
             clientsList.add(inspectionClient);
             return clientsList;
         });
-        clients.computeIfAbsent(votePair, clientsList -> new ArrayList<>()).add(inspectionClient);
+        clients.computeIfAbsent(votePair, clientsList -> Collections.synchronizedList(new ArrayList<>())).add(inspectionClient);
 
 //      VERSION EN JAVA 7
 //        if(clients.containsKey(votePair)){
