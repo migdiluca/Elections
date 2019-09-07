@@ -23,7 +23,7 @@ public class ElectionPOJO {
 
     public ElectionPOJO() {
         electionState = ElectionState.NOT_STARTED;
-        votingList = new ArrayList<>();
+        votingList = Collections.synchronizedList(new ArrayList<>());
         partialVotes = new long[13];
 
         nationalFinalResults = new ArrayList<>();
