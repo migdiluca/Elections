@@ -16,6 +16,30 @@ public class Vote implements Serializable {
         this.province = province;
     }
 
+    public int getTable() {
+        return table;
+    }
+
+    public void setTable(int table) {
+        this.table = table;
+    }
+
+    public List<PoliticalParty> getPreferredParties() {
+        return preferredParties;
+    }
+
+    public void setPreferredParties(List<PoliticalParty> preferredParties) {
+        this.preferredParties = preferredParties;
+    }
+
+    public Province getProvince() {
+        return province;
+    }
+
+    public void setProvince(Province province) {
+        this.province = province;
+    }
+
     @Override
     public String toString() {
         return "Vote{" +

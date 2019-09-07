@@ -1,7 +1,12 @@
 package Elections.server.ServiceImpl;
 
+import Elections.AdministrationService;
+import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.ElectionState;
+import Elections.Models.PoliticalParty;
+import Elections.Models.Province;
 import Elections.Models.Vote;
 import Elections.VotingService;
 
@@ -18,18 +23,13 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     }
 
     @Override
-    /**
-     * return true if votes where processed
-     * return false if vote could not be processed. It suggest that the request must be
-     * retried
-     * */
-    public boolean vote(List<Vote> votes) throws ElectionStateException {
-        if (electionState.getElectionState() != ElectionState.RUNNING) {
-            throw new ElectionStateException("You can not vote if elections are not running");
+    public void vote(int table, List<PoliticalParty> preferredParties, Province province) throws ElectionStateException {
+        if (electionState.getElectionState().equals(ElectionState.FINISHED)){
+            throw new AlreadyFinishedElectionException();
         }
-        // arrancamos un nuevo thread que procese la entrada
-        // tenemos que hacer un thread pool, estático o dinámico, que se encargue de procesar
-        // los votos
-        return true;
+        else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
+            throw new ElectionsNotStartedException();
+        }
+        electionState.addToVoteList(new Vote(table,preferredParties,province));
     }
 }
