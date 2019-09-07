@@ -15,8 +15,7 @@ public class CmdParserUtils {
         }
         try {
             parser.parseArgument(args);
-        } catch (CmdLineException e)
-        {
+        } catch (CmdLineException e) {
             System.out.println(e.getMessage());
             parser.printUsage(System.err);
             System.exit(1);

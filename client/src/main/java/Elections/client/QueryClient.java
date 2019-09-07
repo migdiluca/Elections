@@ -1,9 +1,19 @@
 package Elections.client;
 
+import Elections.AdministrationService;
+import Elections.ConsultingService;
+import Elections.Exceptions.ElectionStateException;
+import Elections.Models.Dimension;
 import Elections.Models.Province;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
+import java.rmi.AccessException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Optional;
 
 public class QueryClient {
@@ -66,5 +76,43 @@ public class QueryClient {
         client.getState().ifPresent(System.out::println);
         client.getTable().ifPresent(System.out::println);
         System.out.println(client.getVotesFileName());
+
+        // si llegamos aca esta recibimos los argumentos de manera correcta
+        // iniciamos la conección con el servicio de query
+        String[] arr = client.getIp().split(":", -1);
+        final ConsultingService cs;
+        final AdministrationService as;
+        try {
+            final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
+            cs = (ConsultingService) registry.lookup(ConsultingService.SERVICE_NAME);
+            as = (AdministrationService) registry.lookup("admin");
+        } catch (RemoteException e) {
+            System.out.println("There where problems finding the registry at ip: " + client.getIp());
+            System.out.println(e.getMessage());
+            return;
+        } catch (NotBoundException e) {
+            System.out.println("There where problems finding the service needed service ");
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        try {
+            if (client.getTable().isPresent()) {
+                cs.checkResult(Dimension.DESK);
+            } else if (client.getState().isPresent()) {
+                cs.checkResult(Dimension.PROVINCE);
+            } else {
+                cs.checkResult(Dimension.NATIONAL);
+            }
+        } catch (RemoteException e) {
+            System.out.println("There was an error retriving results from" + ConsultingService.SERVICE_NAME);
+            System.out.println(e.getMessage());
+        } catch (ElectionStateException e) {
+            System.out.println("Elections are not open");
+            System.out.println(e.getMessage());
+        }
+
+        // generar csv, todo: falta ver que estructura de datos manejamos
     }
+
 }
