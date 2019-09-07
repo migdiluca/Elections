@@ -1,5 +1,6 @@
 package Elections.server.ServiceImpl;
 
+import Elections.AdministrationService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Vote;
 import Elections.VotingService;
@@ -9,10 +10,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
 
-    //private VotingSingleton vt;
+    private ElectionPOJO electionState;
 
-    public VotingServiceImpl() throws RemoteException {
-
+    public VotingServiceImpl(ElectionPOJO electionState) throws RemoteException {
+        this.electionState = electionState;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package Elections.server.ServiceImpl;
 
+import Elections.AdministrationService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionService;
 import Elections.Models.PoliticalParty;
@@ -9,10 +10,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class InspectionServiceImpl extends UnicastRemoteObject implements InspectionService {
 
+    private ElectionPOJO electionState;
 
-
-    public InspectionServiceImpl() throws RemoteException {
-
+    public InspectionServiceImpl(ElectionPOJO electionState) throws RemoteException {
+        this.electionState = electionState;
     }
 
     @Override
