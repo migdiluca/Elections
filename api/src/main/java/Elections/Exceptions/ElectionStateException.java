@@ -1,9 +1,11 @@
 package Elections.Exceptions;
 
 
-public class ElectionStateException extends Exception {
+import Elections.Models.ElectionState;
 
-    public ElectionStateException() {
-        super();
+public class ElectionStateException extends Exception{
+
+    public ElectionStateException(String msg) {
+        super(msg);
     }
 }

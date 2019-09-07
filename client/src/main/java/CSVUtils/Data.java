@@ -19,7 +19,6 @@ public class Data implements Supplier<List<Vote>> {
     }
 
     private List<CSVBean> getVotes(Path path) {
-        long startTime = System.currentTimeMillis();
         List<CSVBean> dataList = null;
         try { // se cerraba solo el Reader en un try catch no?
             Reader reader = Files.newBufferedReader(path);
@@ -30,23 +29,17 @@ public class Data implements Supplier<List<Vote>> {
             System.err.println("Exiting...");
             System.exit(1);
         }
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        System.out.println("====> OPEN CSV Total elapsed: " + elapsedTime);
         return dataList;
     }
 
     @Override
     public List<Vote> get() {
-        long startTime = System.currentTimeMillis();
-        List<Vote> votes = getVotes(csvPath).stream()
+        return getVotes(csvPath).stream()
                 .map(csvBean -> new Vote(csvBean.getTable(),
                         csvBean.getPoliticalParties(),
                         //                Arrays.stream(csvBean.getPoliticalPartys().split(",")).map(PoliticalParty::valueOf).collect(Collectors.toList()),
                         //                Province.valueOf(csvBean.getProvince()))
                         csvBean.getProvince())
                 ).collect(Collectors.toList());
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        System.out.println("====> VOTE LIST Total elapsed: " + elapsedTime);
-        return votes;
     }
 }

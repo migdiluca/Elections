@@ -13,6 +13,10 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
 
     private ElectionPOJO electionState;
 
+    public AdministrationServiceImpl(int port) throws RemoteException {
+        super(port);
+    }
+
     public AdministrationServiceImpl(ElectionPOJO electionState) throws RemoteException {
         this.electionState = electionState;
     }

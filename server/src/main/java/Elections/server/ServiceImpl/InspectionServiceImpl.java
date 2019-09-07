@@ -1,6 +1,5 @@
 package Elections.server.ServiceImpl;
 
-import Elections.AdministrationService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionService;
 import Elections.Models.PoliticalParty;

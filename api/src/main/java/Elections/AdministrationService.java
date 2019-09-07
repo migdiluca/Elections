@@ -9,7 +9,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface AdministrationService extends Remote {
-
+    String SERVICE_NAME = "administration_service";
 
     /**
      * If already finished

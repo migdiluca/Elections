@@ -3,6 +3,6 @@ package Elections.Exceptions;
 public class ElectionsNotStartedException extends ElectionStateException {
 
     public ElectionsNotStartedException() {
-        super();
+        super("Elections have not yet started");
     }
 }

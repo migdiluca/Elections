@@ -1,8 +1,9 @@
 package Elections.Models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Vote {
+public class Vote implements Serializable {
 
     private int table;
     // quizas podria haber otra alternativa mejor para guardar los votos en orden de preferencia
