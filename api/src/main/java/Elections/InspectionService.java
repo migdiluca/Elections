@@ -19,7 +19,7 @@ public interface InspectionService extends Remote {
      *
      * hay que ver como implementar el servicio remoto pavisar que hubo un voto
      */
-    void addInspector(PoliticalParty party, int desk) throws RemoteException, ElectionStateException;
+    void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException;
 
 
 }
