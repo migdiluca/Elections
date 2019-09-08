@@ -72,6 +72,7 @@ public class VotingSystems {
     }
 
     public List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
+        // todo: en vez de mapa de <PoliticalParty, Long> podria tener un <PoliticalParty, List<Vote>> de esta forma ya tengo una lista con los votos a transferir y no hay que recontar los votos
         Map<PoliticalParty, Long> masterMap = votes.stream()
                 .collect(Collectors.groupingBy(
                         vote -> vote.getPreferredParties().get(0),
