@@ -21,7 +21,7 @@ import java.util.List;
 
 public class CSVWrite {
 
-    public static void writeCsvFromBean(Path path, List<Pair<BigDecimal, PoliticalParty>> result) {
+    public static void writeCsv(Path path, List<Pair<BigDecimal, PoliticalParty>> result) {
         try {
             Writer writer = Files.newBufferedWriter(path);
             ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();

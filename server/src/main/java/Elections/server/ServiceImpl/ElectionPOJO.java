@@ -1,6 +1,5 @@
 package Elections.server.ServiceImpl;
 
-
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -17,8 +16,8 @@ public class ElectionPOJO {
     private long[] partialVotes;
 
     private List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults;
-    private Map<Province,List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
-    private Map<Integer,List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
+    private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
+    private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
 
     public ElectionPOJO() {
@@ -29,17 +28,17 @@ public class ElectionPOJO {
         nationalFinalResults = new ArrayList<>();
         provinceFinalResults = new HashMap<>();
         for (Province p : Province.values()) {
-            provinceFinalResults.put(p,new ArrayList<>());
+            provinceFinalResults.put(p, new ArrayList<>());
         }
         deskFinalResults = new HashMap<>();
     }
 
-    public void addToVoteList(Vote vote){
+    public void addToVoteList(Vote vote) {
         votingList.add(vote);
         partialVotes[vote.getPreferredParties().get(0).ordinal()]++;
     }
 
-    public int getAmountOfVotes(){
+    public int getAmountOfVotes() {
         return votingList.size();
     }
 

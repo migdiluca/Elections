@@ -14,8 +14,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class VoteClient {
 
@@ -55,7 +54,7 @@ public class VoteClient {
         List<Vote> votes = new ArrayList<>(data.get());
 
         // iniciamos la conección con el servidor
-        String[] arr = client.getIp().split(":",-1);
+        String[] arr = client.getIp().split(":", -1);
         final VotingService vs;
         final AdministrationService as;
         try {
@@ -86,10 +85,10 @@ public class VoteClient {
                 System.out.println(votes.size() + " votes registered");
             }
         } catch (RemoteException e) {
-            System.out.println("There was an error uploading the votes" + VotingService.SERVICE_NAME );
+            System.out.println("There was an error uploading the votes" + VotingService.SERVICE_NAME);
             System.out.println(e.getMessage());
         } catch (ElectionStateException e) {
-            System.out.println("Elections are not open: " + VotingService.SERVICE_NAME );
+            System.out.println("Elections are not open: " + VotingService.SERVICE_NAME);
             System.out.println(e.getMessage());
         }
     }
@@ -97,7 +96,7 @@ public class VoteClient {
     private boolean uploadVotes(VotingService vs, List<Vote> votes) throws RemoteException, ElectionStateException {
         int bulkPacketsAmount = (int) Math.ceil(votes.size() / VotingService.bulkSize);
         for (int i = 0; i < bulkPacketsAmount; i++) {
-            List<Vote> sublist = new ArrayList<>(votes.subList(i*bulkPacketsAmount, i*bulkPacketsAmount + VotingService.bulkSize));
+            List<Vote> sublist = new ArrayList<>(votes.subList(i * bulkPacketsAmount, i * bulkPacketsAmount + VotingService.bulkSize));
             vs.vote(sublist);
         }
         return true;

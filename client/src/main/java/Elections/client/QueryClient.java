@@ -4,7 +4,6 @@ import CSVUtils.CSVWrite;
 import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.Exceptions.ElectionStateException;
-import Elections.Models.Dimension;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import javafx.util.Pair;
@@ -12,18 +11,13 @@ import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.AccessException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.TreeMap;
 
 public class QueryClient {
 
@@ -120,7 +114,7 @@ public class QueryClient {
             System.out.println(e.getMessage());
         }
 
-        CSVWrite.writeCsvFromBean(Paths.get(client.getVotesFileName()), results);
+        CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
 
     }
 }

@@ -11,13 +11,12 @@ import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import javafx.util.Pair;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConsultingServiceImpl extends UnicastRemoteObject implements ConsultingService {
 
