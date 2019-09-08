@@ -83,4 +83,19 @@ public class VotingSystems {
                 .map(entry -> new Pair<>(new BigDecimal(entry.getValue() * 100 / Double.valueOf(votes.size())), entry.getKey()))
                 .collect(Collectors.toList());
     }
+
+    public void calculateDeskResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> entry){
+        Map<Integer, List<Vote>> votesPerDesk =
+                votes.stream().collect(Collectors.groupingBy(Vote::getTable));
+
+        votesPerDesk.forEach((k,v)->{
+            Map<PoliticalParty, List<Vote>> collect = v.stream().collect(Collectors.groupingBy((u) -> u.getPreferredParties().get(0)));
+            List<Pair<BigDecimal,PoliticalParty>> list = new ArrayList<>();
+            collect.forEach((x,y)->{
+                list.add(new Pair<>(new BigDecimal(y.size()/v.size()),x));
+            });
+            list.sort((a,b)-> a.getKey().subtract(b.getKey()).intValue());
+            entry.put(k,list);
+        });
+    }
 }
