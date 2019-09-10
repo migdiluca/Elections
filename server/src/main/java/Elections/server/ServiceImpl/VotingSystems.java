@@ -12,47 +12,64 @@ import java.util.stream.Collectors;
 
 public class VotingSystems {
 
-    List<Vote> votes;
+    private List<Vote> votes;
 
     public VotingSystems(List<Vote> votes) {
         this.votes = votes;
     }
 
-    private void doTransferVoteAV(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, Vote vote) {
+    /*
+        Retorna true/false según si el voto fue transferido o no
+    */
+    private boolean doTransferVoteAV(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, Vote vote) {
         List<PoliticalParty> parties = vote.getPreferredParties();
         int i = 0;
-        for (; i < parties.size(); i++) {
-            if (eliminatedParties.contains(parties.get(i))) {
-                // opcion1: voto ya transferido => falso shift de la lista
-                // opcion2: voto a transferir, pero el candidato que le sigue ya fue eliminado => falso shift de la lista
-                // opcion3: voto al candidato eliminado => voto a transferir
-                // falso shift de la lista
-            } else {
-                // hay un candidato que sigue compitiendo => se le transfiere un voto
-                break;
-            }
+        while (i < parties.size() && eliminatedParties.contains(parties.get(i))) {
+            // opcion: voto ya transferido => falso shift de la lista
+            // opcion: voto a transferir, pero el candidato que le sigue ya fue eliminado => falso shift de la lista
+            // opcion: voto al candidato eliminado => voto a transferir
+            // falso shift de la lista
+            i++;
         }
         if (i != parties.size()) {
-            // tenemos un candidato a quien transferirle votos
+            // hay un candidato que sigue compitiendo => se le transfiere un voto
             PoliticalParty party = parties.get(i);
             masterMap.get(party).add(vote);
+            return true;
         }
+        return false;
     }
 
-    private void transferVotesAV(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, List<Vote> transferableVotes) {
-        transferableVotes.forEach(vote -> doTransferVoteAV(masterMap, eliminatedParties, vote));
+    /*
+        Retorna la cantidad de votos que fueron transferidos
+     */
+    private int transferVotesAV(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, List<Vote> transferableVotes) {
+//        transferableVotes.forEach(vote -> doTransferVoteAV(masterMap, eliminatedParties, vote));
+        // no uso java 8 ya que no deja incluir variables no final en sus bloques de codigo {}
+        int count = 0;
+        for (Vote vote : transferableVotes) {
+            if (doTransferVoteAV(masterMap, eliminatedParties, vote)) {
+                count++;
+            }
+        }
+        return count;
     }
 
-    private void alternativeVoteNationalLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties) {
+    /*
+        Retorna Pair (porcentaje de votos, partido politico) del ganador de la eleccion
+     */
+    private Pair<BigDecimal, PoliticalParty> alternativeVoteNationalLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, int total) {
         // ordenamos el mapa
         // podria haber usado los metodos max/min de streams pero seria mas conveniente ordenarlo de una y no 2 veces
         List<Map.Entry<PoliticalParty, List<Vote>>> sortedEntries = masterMap.entrySet().stream()
                 .sorted((e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()))
                 .collect(Collectors.toList());
-        if ((sortedEntries.get(0).getValue().size() / (double) votes.size()) > 0.5 || sortedEntries.size() == 2) {
-            // hay un ganador, quitamos al segundo del mapa
-            masterMap.remove(sortedEntries.get(1).getKey());
-            return;
+        if ((sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
+            // hay un ganador
+            return new Pair<>(
+                    new BigDecimal(sortedEntries.get(0).getValue().size() / (double) total),
+                    sortedEntries.get(0).getKey()
+            );
         }
         Map.Entry<PoliticalParty, List<Vote>> loser = sortedEntries.get(sortedEntries.size() - 1);
         /* todo: el perdedor podria haber empatado con otro candidato -> alternativas:
@@ -62,17 +79,18 @@ public class VotingSystems {
         */
         masterMap.remove(loser.getKey());
         eliminatedParties.add(loser.getKey());
-        transferVotesAV(masterMap, eliminatedParties, loser.getValue());
-        alternativeVoteNationalLevelREC(masterMap, eliminatedParties);
+        int trasnferredVotes = transferVotesAV(masterMap, eliminatedParties, loser.getValue());
+        int votesLost = loser.getValue().size() - trasnferredVotes;
+        return alternativeVoteNationalLevelREC(masterMap, eliminatedParties, total - votesLost);
     }
 
-    public List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
+    /*
+       Retorna Pair(porcentaje de votos, partido politico) del ganador de la eleccion
+    */
+    public Pair<BigDecimal, PoliticalParty> alternativeVoteNationalLevel() {
         Map<PoliticalParty, List<Vote>> masterMap = votes.stream()
                 .collect(Collectors.groupingBy(vote -> vote.getPreferredParties().get(0)));
-        alternativeVoteNationalLevelREC(masterMap, new ArrayList<>());
-        return masterMap.entrySet().stream()
-                .map(entry -> new Pair<>(new BigDecimal(entry.getValue().size() * 100 / (double) votes.size()), entry.getKey()))
-                .collect(Collectors.toList());
+        return alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
     }
 
     public void calculateDeskResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> entry) {
