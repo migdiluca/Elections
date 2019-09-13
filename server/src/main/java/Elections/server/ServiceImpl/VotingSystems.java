@@ -152,7 +152,7 @@ public class VotingSystems {
         } else if (availableSeats < 0 ) {
             // no se si es posible este caso
             // todo ??
-            
+
         }
 
         // retornamos la lista de winners concatenada con los winners de otras iteraciones
