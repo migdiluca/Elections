@@ -8,22 +8,28 @@ import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 public class ElectionPOJO {
 
     private ElectionState electionState;
     private List<Vote> votingList;
-    private long[] partialVotes;
+    private LongAdder[] partialVotes;
 
     private List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults;
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
-
+    private final Object helperA = 0;
+    private final Object helperB = 0;
     public ElectionPOJO() {
         electionState = ElectionState.NOT_STARTED;
         votingList = Collections.synchronizedList(new ArrayList<>());
-        partialVotes = new long[13];
+        partialVotes = new LongAdder[13];
+        for (int i = 0; i < partialVotes.length; i++) {
+            partialVotes[i] = new LongAdder();
+        }
 
         nationalFinalResults = new ArrayList<>();
         provinceFinalResults = new HashMap<>();
@@ -33,60 +39,41 @@ public class ElectionPOJO {
         deskFinalResults = new HashMap<>();
     }
 
-    public void addToVoteList(Vote vote) {
-        votingList.add(vote);
-        partialVotes[vote.getPreferredParties().get(0).ordinal()]++;
+    void addToVoteList(Vote vote) {
+        synchronized (helperA) {
+            votingList.add(vote);
+        }
+        synchronized (helperB) {
+            partialVotes[vote.getPreferredParties().get(0).ordinal()].increment();
+        }
     }
 
-    public int getAmountOfVotes() {
+    int getAmountOfVotes() {
         return votingList.size();
     }
 
-    public ElectionState getElectionState() {
+    ElectionState getElectionState() {
         return electionState;
     }
 
-    public void setElectionState(ElectionState electionState) {
+    void setElectionState(ElectionState electionState) {
         this.electionState = electionState;
     }
 
-    public List<Vote> getVotingList() {
-        return votingList;
+    Long[] getPartialVotes() {
+        return Arrays.stream(partialVotes).map(LongAdder::longValue).toArray(Long[]::new);
     }
 
-    public void setVotingList(List<Vote> votingList) {
-        this.votingList = votingList;
-    }
-
-    public long[] getPartialVotes() {
-        return partialVotes;
-    }
-
-    public void setPartialVotes(long[] partialVotes) {
-        this.partialVotes = partialVotes;
-    }
-
-    public List<Pair<BigDecimal, PoliticalParty>> getNationalFinalResults() {
+    List<Pair<BigDecimal, PoliticalParty>> getNationalFinalResults() {
         return nationalFinalResults;
     }
 
-    public void setNationalFinalResults(List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults) {
-        this.nationalFinalResults = nationalFinalResults;
-    }
-
-    public Map<Province, List<Pair<BigDecimal, PoliticalParty>>> getProvinceFinalResults() {
+    Map<Province, List<Pair<BigDecimal, PoliticalParty>>> getProvinceFinalResults() {
         return provinceFinalResults;
     }
 
-    public void setProvinceFinalResults(Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults) {
-        this.provinceFinalResults = provinceFinalResults;
-    }
-
-    public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> getDeskFinalResults() {
+    Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> getDeskFinalResults() {
         return deskFinalResults;
     }
 
-    public void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
-        this.deskFinalResults = deskFinalResults;
-    }
 }

@@ -1,12 +1,9 @@
 package Elections.server.ServiceImpl;
 
-import Elections.AdministrationService;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.ElectionState;
-import Elections.Models.PoliticalParty;
-import Elections.Models.Province;
 import Elections.Models.Vote;
 import Elections.VotingService;
 
@@ -32,4 +29,5 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         }
         votes.forEach(vote -> electionState.addToVoteList(vote));
     }
+
 }
