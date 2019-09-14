@@ -23,38 +23,35 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
     }
 
     @Override
-    public List<Pair<BigDecimal, PoliticalParty>> checkResultNational()
-            throws RemoteException, ElectionStateException {
+    public List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException {
         List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-        return p != null?p:electionState.getNationalFinalResults();
+        return p != null ? p : electionState.getNationalFinalResults();
     }
 
     @Override
     public List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException {
         List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-        return p != null?p:electionState.getProvinceFinalResults().get(province);
+        return p != null ? p : electionState.getProvinceFinalResults().get(province);
     }
 
     @Override
     public List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException {
         List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-        return p != null?p:electionState.getDeskFinalResults().get(desk);
+        return p != null ? p : electionState.getDeskFinalResults().get(desk);
     }
 
 
     private List<Pair<BigDecimal, PoliticalParty>> notCompletedResults() throws RemoteException, ElectionStateException {
-        if(electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
+        if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
             throw new ElectionsNotStartedException();
-        }
-        else if(electionState.getElectionState().equals(ElectionState.RUNNING)){
+        } else if (electionState.getElectionState().equals(ElectionState.RUNNING)) {
             List<Pair<BigDecimal, PoliticalParty>> retList = new ArrayList<>();
             for (int i = 0; i < PoliticalParty.values().length; i++) {
                 PoliticalParty p = PoliticalParty.values()[i];
                 retList.add(new Pair<>(new BigDecimal(
-                        100* electionState.getPartialVotes()[i] / electionState.getAmountOfVotes()), p));
+                        100 * electionState.getPartialVotes()[i] / electionState.getAmountOfVotes()).setScale(2, BigDecimal.ROUND_DOWN), p));
             }
             return retList;
-        }
-        else return null;
+        } else return null;
     }
 }

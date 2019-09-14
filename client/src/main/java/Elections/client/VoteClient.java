@@ -54,11 +54,11 @@ public class VoteClient {
         List<Vote> votes = new ArrayList<>(data.get());
 
         // iniciamos la conección con el servidor
-        String[] arr = client.getIp().split(":", -1);
+        String[] serverAddr = client.getIp().split(":", -1);
         final VotingService vs;
         final AdministrationService as;
         try {
-            final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
+            final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
             vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
             as = (AdministrationService) registry.lookup(AdministrationService.SERVICE_NAME);
             if (as.getElectionState() != ElectionState.RUNNING) {
@@ -69,7 +69,7 @@ public class VoteClient {
             System.out.println(e.getMessage());
             return;
         } catch (NotBoundException e) {
-            System.out.println("There where problems finding the service needed service ");
+            System.out.println("There where problems finding the service needed service");
             System.out.println(e.getMessage());
             return;
         } catch (ElectionStateException e) {

@@ -22,19 +22,19 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     }
 
     @Override
-    public void openElections() throws ElectionStateException {
+    public void openElections() throws ElectionStateException, RemoteException {
         if(electionState.getElectionState().equals(ElectionState.FINISHED))
             throw new AlreadyFinishedElectionException();
         electionState.setElectionState(ElectionState.RUNNING);
     }
 
     @Override
-    public ElectionState getElectionState() {
+    public ElectionState getElectionState() throws RemoteException {
         return electionState.getElectionState();
     }
 
     @Override
-    public void finishElections() throws ElectionStateException {
+    public void finishElections() throws ElectionStateException, RemoteException {
         if(electionState.getElectionState().equals(ElectionState.NOT_STARTED))
             throw new ElectionsNotStartedException();
         electionState.setElectionState(ElectionState.FINISHED);

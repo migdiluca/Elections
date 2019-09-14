@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface VotingService extends Remote {
+
     int bulkSize = 1000;
     String SERVICE_NAME = "voting_service";
 

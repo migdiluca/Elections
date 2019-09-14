@@ -20,7 +20,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     }
 
     @Override
-    public void vote(List<Vote> votes) throws ElectionStateException {
+    public void vote(List<Vote> votes) throws ElectionStateException, RemoteException {
         if (electionState.getElectionState().equals(ElectionState.FINISHED)){
             throw new AlreadyFinishedElectionException();
         }

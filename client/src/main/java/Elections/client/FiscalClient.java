@@ -62,20 +62,43 @@ public class FiscalClient implements InspectionClient {
         System.out.println(client.getParty().name());
         System.out.println(client.getTable());
 
+        // Iniciamos la conección con el servidor
+        String[] serverAddr = client.getIp().split(":", -1);
+        final InspectionService is;
         try {
-            UnicastRemoteObject.exportObject(client,0);
-            Registry registry = LocateRegistry.getRegistry(client.getIp(), 0);
-
-            InspectionService server = (InspectionService) registry.lookup("inspection_service");
-            server.addInspector(client, client.getParty(), client.getTable());
-
-        } catch(NotBoundException e){
-            System.out.println("Service not found, wrong name?");
-        }catch (ElectionStateException e){
-            System.out.println("The election already started or is finished");
-        } catch (RemoteException e){
-            System.out.println("Remote exception on client side on FiscalClient");
+            final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
+            is = (InspectionService) registry.lookup(InspectionService.SERVICE_NAME);
+        } catch (NotBoundException e) {
+            System.out.println("There where problems finding the service needed service");
+            return;
+        } catch (RemoteException e) {
+            System.out.println("There where problems finding the registry at ip: " + client.getIp());
+            return;
         }
+
+        // creamos objeto remoto
+        try {
+            UnicastRemoteObject.exportObject(client, 0);
+        } catch (RemoteException e) {
+            System.out.println("There was a problem.");
+            return;
+        }
+
+        // Registramos la funcion de callback del cliente
+        try {
+            is.addInspector(client, client.getParty(), client.getTable());
+        } catch (RemoteException e) {
+            System.out.println("Could not reach service");
+            return;
+        } catch (ElectionStateException e) {
+            System.out.println("Elections are closed or already started");
+            return;
+        }
+
+        // Nos registramos correctamente
+        System.out.println("Fiscal of " + client.getParty().name() + " registered on polling place " + client.getTable());
+
+        // todo: registrar funcion para que me avise cuando cerraron las votaciones asi termino el programa?
     }
 
     @Override
