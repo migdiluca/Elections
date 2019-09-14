@@ -5,7 +5,9 @@ import Elections.Models.Vote;
 import javafx.util.Pair;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,7 +69,7 @@ public class VotingSystems {
         if ((sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
             // hay un ganador
             return new Pair<>(
-                    new BigDecimal(sortedEntries.get(0).getValue().size() / (double) total),
+                    new BigDecimal(sortedEntries.get(0).getValue().size() / (double) total).setScale(2, BigDecimal.ROUND_DOWN),
                     sortedEntries.get(0).getKey()
             );
         }
@@ -93,18 +95,19 @@ public class VotingSystems {
         return alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
     }
 
-    public void calculateDeskResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> entry) {
-        Map<Integer, List<Vote>> votesPerDesk =
-                votes.stream().collect(Collectors.groupingBy(Vote::getTable));
-
+    public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> calculateDeskResults() {
+        Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
+        Map<Integer, List<Vote>> votesPerDesk = votes.stream()
+                .collect(Collectors.groupingBy(Vote::getTable));
         votesPerDesk.forEach((k, v) -> {
             Map<PoliticalParty, List<Vote>> collect = v.stream().collect(Collectors.groupingBy((u) -> u.getPreferredParties().get(0)));
             List<Pair<BigDecimal, PoliticalParty>> list = new ArrayList<>();
             collect.forEach((x, y) -> {
-                list.add(new Pair<>(new BigDecimal(y.size() / v.size()), x));
+                list.add(new Pair<>(new BigDecimal(y.size() / (double) v.size()).setScale(2, BigDecimal.ROUND_DOWN), x));
             });
             list.sort((a, b) -> a.getKey().subtract(b.getKey()).intValue());
-            entry.put(k, list);
+            map.put(k, list);
         });
+        return map;
     }
 }
