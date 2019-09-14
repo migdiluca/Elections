@@ -13,10 +13,10 @@
     <module>client</module>
   </modules>
   <properties>
+    <args4j.version>2.33</args4j.version>
+    <opencsv.version>4.1</opencsv.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <slf4j.version>1.7.12</slf4j.version>
-    <opencsv.version>4.1</opencsv.version>
-    <args4j.version>2.33</args4j.version>
   </properties>
   <dependencyManagement>
     <!--Estas dependencias son las que hereden los hijos-->
@@ -27,13 +27,6 @@
         <version>3.6.5</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-bom</artifactId>
-        <version>2.6.2</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
         <groupId>args4j</groupId>
         <artifactId>args4j</artifactId>
         <version>${args4j.version}</version>
@@ -42,6 +35,13 @@
         <groupId>com.opencsv</groupId>
         <artifactId>opencsv</artifactId>
         <version>${opencsv.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>2.6.2</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -146,6 +146,17 @@
           <sortDependencies>scope</sortDependencies>
           <verifyFail>Stop</verifyFail>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.7.1</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.0.0</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>

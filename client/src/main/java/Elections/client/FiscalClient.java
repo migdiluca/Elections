@@ -1,21 +1,17 @@
 package Elections.client;
 
 import Elections.Exceptions.ElectionStateException;
-import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.InspectionClient;
 import Elections.InspectionService;
 import Elections.Models.PoliticalParty;
-import com.sun.security.ntlm.Server;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Optional;
 
 public class FiscalClient implements InspectionClient {
 
