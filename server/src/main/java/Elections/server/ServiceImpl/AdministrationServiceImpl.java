@@ -11,13 +11,13 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class AdministrationServiceImpl extends UnicastRemoteObject implements AdministrationService {
 
-    private ElectionPOJO electionState;
+    private Election electionState;
 
     public AdministrationServiceImpl(int port) throws RemoteException {
         super(port);
     }
 
-    public AdministrationServiceImpl(ElectionPOJO electionState) throws RemoteException {
+    public AdministrationServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
     }
 

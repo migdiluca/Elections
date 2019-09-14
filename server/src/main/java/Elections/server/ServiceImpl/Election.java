@@ -9,7 +9,7 @@ import javafx.util.Pair;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class ElectionPOJO {
+public class Election {
 
     private ElectionState electionState;
     private List<Vote> votingList;
@@ -20,7 +20,7 @@ public class ElectionPOJO {
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
 
-    public ElectionPOJO() {
+    public Election() {
         electionState = ElectionState.NOT_STARTED;
         votingList = Collections.synchronizedList(new ArrayList<>());
         partialVotes = new long[13];

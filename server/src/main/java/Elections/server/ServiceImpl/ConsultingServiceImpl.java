@@ -1,28 +1,24 @@
 package Elections.server.ServiceImpl;
 
 
-import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
-import Elections.Models.Dimension;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import javafx.util.Pair;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ConsultingServiceImpl extends UnicastRemoteObject implements ConsultingService {
 
-    private ElectionPOJO electionState;
+    private Election electionState;
 
-    public ConsultingServiceImpl(ElectionPOJO electionState) throws RemoteException {
+    public ConsultingServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
     }
 

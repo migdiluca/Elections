@@ -1,12 +1,9 @@
 package Elections.server.ServiceImpl;
 
-import Elections.AdministrationService;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.ElectionState;
-import Elections.Models.PoliticalParty;
-import Elections.Models.Province;
 import Elections.Models.Vote;
 import Elections.VotingService;
 
@@ -16,9 +13,9 @@ import java.util.List;
 
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
 
-    private ElectionPOJO electionState;
+    private Election electionState;
 
-    public VotingServiceImpl(ElectionPOJO electionState) throws RemoteException {
+    public VotingServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
     }
 

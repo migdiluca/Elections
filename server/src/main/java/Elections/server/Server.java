@@ -20,7 +20,7 @@ public class Server {
 
         logger.info("Elections Server Starting ...");
 
-        ElectionPOJO electionState = new ElectionPOJO();
+        Election electionState = new Election();
 
         AdministrationService as = new AdministrationServiceImpl(electionState);
         VotingService vs = new VotingServiceImpl(electionState);
