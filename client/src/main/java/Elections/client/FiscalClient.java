@@ -3,6 +3,7 @@ package Elections.client;
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionClient;
 import Elections.FiscalService;
+import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import org.kohsuke.args4j.Option;
 
@@ -60,10 +61,6 @@ public class FiscalClient implements InspectionClient {
             exit(1);
         }
 
-        System.out.println(client.getIp());
-        System.out.println(client.getParty().name());
-        System.out.println(client.getTable());
-
         // Iniciamos la conección con el servidor
         String[] serverAddr = client.getIp().split(":", -1);
         final FiscalService is;
@@ -112,8 +109,19 @@ public class FiscalClient implements InspectionClient {
     }
 
     @Override
-    public void endClient() {
+    public void endClient() throws RemoteException {
         System.out.println("Elections finished");
         exit(0);
+    }
+
+    @Override
+    public void submitError(ElectionState electionState) throws RemoteException {
+        if(electionState.equals(ElectionState.RUNNING)) {
+            System.out.println("Elections already started");
+        }
+        else if(electionState.equals(ElectionState.FINISHED)) {
+            System.out.println("Elections already finished");
+        }
+        endClient();
     }
 }

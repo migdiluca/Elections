@@ -79,10 +79,12 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
                     for (int i = 0; i < PoliticalParty.values().length; i++) {
                         PoliticalParty p = PoliticalParty.values()[i];
                         retList.add(new Pair<>(new BigDecimal(
-                                100 * electionState.getPartialVotes()[i] / electionState.getAmountOfVotes()).setScale(2, BigDecimal.ROUND_DOWN), p));
+                                100 * electionState.getPartialVotes()[i] / (double) electionState.getAmountOfVotes()).setScale(2, BigDecimal.ROUND_DOWN), p));
                     }
                     return retList;
-                } else return null;
+                } else {
+                    return null;
+                }
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {

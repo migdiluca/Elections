@@ -74,11 +74,6 @@ public class QueryClient {
             System.exit(1);
         }
 
-        System.out.println(client.getIp());
-        client.getState().ifPresent(System.out::println);
-        client.getTable().ifPresent(System.out::println);
-        System.out.println(client.getVotesFileName());
-
         // si llegamos aca esta recibimos los argumentos de manera correcta
         // iniciamos la conección con el servicio de query
         String[] arr = client.getIp().split(":", -1);
@@ -113,7 +108,7 @@ public class QueryClient {
             System.out.println("Elections are not open");
             System.out.println(e.getMessage());
         }
-
+        System.out.println(results);
         CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
 
     }
