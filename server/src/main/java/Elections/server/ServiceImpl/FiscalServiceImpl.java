@@ -3,6 +3,7 @@ package Elections.server.ServiceImpl;
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionClient;
 import Elections.FiscalService;
+import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import javafx.util.Pair;
 
@@ -26,6 +27,11 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
 
     @Override
     public void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException {
+        if(!electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
+            inspectionClient.submitError(electionState.getElectionState());
+            return;
+        }
+
         Future<?> future = exService.submit(() -> {
             Pair<PoliticalParty, Integer> votePair = new Pair<>(party, table);
             electionState.getFiscalClients().computeIfPresent(votePair, (key, clientsList) -> {
@@ -39,15 +45,6 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
         } catch (InterruptedException | ExecutionException e) {
             throw new ElectionStateException(e.getMessage());
         }
-
-//      VERSION EN JAVA 7
-//        if(clients.containsKey(votePair)){
-//            clients.get(votePair).add(inspectionClient);
-//        } else {
-//            List<InspectionClient> clientsToNotify = new ArrayList<>();
-//            clientsToNotify.add(inspectionClient);
-//            clients.put(new Pair<>(party,table),clientsToNotify);
-//        }
     }
 
 }

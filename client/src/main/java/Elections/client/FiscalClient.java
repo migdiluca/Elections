@@ -3,6 +3,7 @@ package Elections.client;
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionClient;
 import Elections.FiscalService;
+import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import org.kohsuke.args4j.Option;
 
@@ -107,7 +108,7 @@ public class FiscalClient implements InspectionClient {
     }
 
     @Override
-    public void notifyVote() throws RemoteException {
+    public void notifyVote() {
         System.out.println("New vote for " + party.name() + " on pooling place " + table.toString());
     }
 
@@ -115,5 +116,16 @@ public class FiscalClient implements InspectionClient {
     public void endClient() {
         System.out.println("Elections finished");
         exit(0);
+    }
+
+    @Override
+    public void submitError(ElectionState electionState) {
+        if(electionState.equals(ElectionState.RUNNING)) {
+            System.out.println("Elections already started");
+        }
+        else if(electionState.equals(ElectionState.FINISHED)) {
+            System.out.println("Elections already finished");
+        }
+        endClient();
     }
 }
