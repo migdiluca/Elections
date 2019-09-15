@@ -22,7 +22,7 @@ public class Election {
 
     private final Object mutexVotesA = "Vote list mutex";
     private final Object mutexVotesB = "Partial votes list mutex";
-    private final String mutexState = "Election state mutex";
+    private final Object mutexState = "Election state mutex";
 
     public Election() {
         electionState = ElectionState.NOT_STARTED;
