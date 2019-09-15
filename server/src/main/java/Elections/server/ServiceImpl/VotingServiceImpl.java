@@ -7,7 +7,10 @@ import Elections.InspectionClient;
 import Elections.Models.ElectionState;
 import Elections.Models.Vote;
 import Elections.VotingService;
+import Elections.server.Server;
 import javafx.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -16,6 +19,7 @@ import java.util.concurrent.*;
 
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
 
+    private static Logger logger = LoggerFactory.getLogger(Server.class);
     private Election electionState;
     private ExecutorService exService;
 
@@ -45,15 +49,17 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         }
     }
 
-    private void notifyVoteToClients(Vote vote){
-        vote.getPreferredParties().forEach(politicalParty -> {
-            List<InspectionClient> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getTable()));
-            clientsToNotify.forEach(inspectionClient -> {
-                try{
-                    inspectionClient.notifyVote();
-                } catch (RemoteException e){
-                    System.out.println("Remote exception while notifying votes");
-                }
+    private void notifyVoteToClients(Vote vote) {
+        exService.submit(() -> {
+            vote.getPreferredParties().forEach(politicalParty -> {
+                List<InspectionClient> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getTable()));
+                clientsToNotify.forEach(inspectionClient -> {
+                    try {
+                        inspectionClient.notifyVote();
+                    } catch (RemoteException e) {
+                        logger.error("Remote exception while notifying client");
+                    }
+                });
             });
         });
     }
