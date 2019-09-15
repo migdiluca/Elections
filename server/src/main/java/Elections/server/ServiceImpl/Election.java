@@ -17,6 +17,7 @@ public class Election {
     private List<Vote> votingList;
     private LongAdder[] partialVotes;
 
+    //TODO: Fer fijate los segundos, terceros etc.
     private List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults;
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
@@ -96,5 +97,9 @@ public class Election {
 
     public void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
         this.deskFinalResults = deskFinalResults;
+    }
+
+    public List<Vote> getVotingList() {
+        return votingList;
     }
 }

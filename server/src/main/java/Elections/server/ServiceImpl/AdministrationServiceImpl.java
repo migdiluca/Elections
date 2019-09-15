@@ -6,9 +6,18 @@ import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
+import Elections.Models.PoliticalParty;
+import Elections.Models.Province;
+import javafx.util.Pair;
 
+
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +27,7 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
 
     private Election election;
     private ExecutorService exService;
+    private VotingSystems votingSystems;
 
     public AdministrationServiceImpl(int port) throws RemoteException {
         super(port);
@@ -60,6 +70,23 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
             throw new AlreadyFinishedElectionException();
         }
         election.setElectionState(ElectionState.FINISHED);
+
+        this.votingSystems = new VotingSystems(election.getVotingList());
+        election.setDeskFinalResults(votingSystems.calculateDeskResults());
+        List<Pair<BigDecimal, PoliticalParty>> list =  new ArrayList<>();
+        list.add(votingSystems.alternativeVoteNationalLevel());
+        election.setNationalFinalResults(list);
+
+        //FIXME: hardcodeado para testeo
+
+        Map<Province, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
+        for (Province p: Province.values()) {
+            List<Pair<BigDecimal, PoliticalParty>> l = new ArrayList<>();
+            l.add(new Pair<>(new BigDecimal(50.0), PoliticalParty.BUFFALO));
+            map.put(p,l);
+        }
+        election.setProvinceFinalResults(map);
+
         notifyEndToClients();
     }
 
