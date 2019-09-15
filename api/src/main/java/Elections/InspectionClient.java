@@ -7,4 +7,5 @@ public interface InspectionClient extends Remote {
 
     void notifyVote() throws RemoteException;
 
+    void endClient() throws RemoteException;
 }

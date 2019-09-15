@@ -2,7 +2,7 @@ package Elections.client;
 
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionClient;
-import Elections.InspectionService;
+import Elections.FiscalService;
 import Elections.Models.PoliticalParty;
 import org.kohsuke.args4j.Option;
 
@@ -12,6 +12,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+
+import static java.lang.System.exit;
 
 public class FiscalClient implements InspectionClient {
 
@@ -55,7 +57,7 @@ public class FiscalClient implements InspectionClient {
         } catch (IOException e) {
             // todo: no imprimir un stack asi nomas
             e.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
 
         System.out.println(client.getIp());
@@ -64,10 +66,10 @@ public class FiscalClient implements InspectionClient {
 
         // Iniciamos la conección con el servidor
         String[] serverAddr = client.getIp().split(":", -1);
-        final InspectionService is;
+        final FiscalService is;
         try {
             final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
-            is = (InspectionService) registry.lookup(InspectionService.SERVICE_NAME);
+            is = (FiscalService) registry.lookup(FiscalService.SERVICE_NAME);
         } catch (NotBoundException e) {
             System.out.println("There where problems finding the service needed service");
             return;
@@ -99,10 +101,19 @@ public class FiscalClient implements InspectionClient {
         System.out.println("Fiscal of " + client.getParty().name() + " registered on polling place " + client.getTable());
 
         // todo: registrar funcion para que me avise cuando cerraron las votaciones asi termino el programa?
+        while(true){
+
+        }
     }
 
     @Override
     public void notifyVote() throws RemoteException {
         System.out.println("New vote for " + party.name() + " on pooling place " + table.toString());
+    }
+
+    @Override
+    public void endClient() {
+        System.out.println("Elections finished");
+        exit(0);
     }
 }

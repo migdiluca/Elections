@@ -2,35 +2,31 @@ package Elections.server.ServiceImpl;
 
 import Elections.Exceptions.ElectionStateException;
 import Elections.InspectionClient;
-import Elections.InspectionService;
+import Elections.FiscalService;
 import Elections.Models.PoliticalParty;
-import Elections.Models.Vote;
 import javafx.util.Pair;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-public class InspectionServiceImpl extends UnicastRemoteObject implements InspectionService {
+public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalService {
 
     private Election electionState;
 
-    private Map<Pair<PoliticalParty, Integer>,List<InspectionClient>> clients;
-
-    public InspectionServiceImpl(Election electionState) throws RemoteException {
+    public FiscalServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
-        clients = Collections.synchronizedMap(new HashMap<>());
     }
 
     @Override
     public void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException {
         Pair<PoliticalParty, Integer> votePair = new Pair<>(party,table);
 
-        clients.computeIfPresent(votePair, (key, clientsList) -> {
+        electionState.getFiscalClients().computeIfPresent(votePair, (key, clientsList) -> {
             clientsList.add(inspectionClient);
             return clientsList;
         });
-        clients.computeIfAbsent(votePair, clientsList -> Collections.synchronizedList(new ArrayList<>())).add(inspectionClient);
+        electionState.getFiscalClients().computeIfAbsent(votePair, clientsList -> Collections.synchronizedList(new ArrayList<>())).add(inspectionClient);
 
 //      VERSION EN JAVA 7
 //        if(clients.containsKey(votePair)){
@@ -42,10 +38,9 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
 //        }
     }
 
-    public void notifyVoteToClients(Vote vote){
-
+    /*public void notifyVoteToClients(Vote vote){
         vote.getPreferredParties().forEach(politicalParty -> {
-            List<InspectionClient> clientsToNotify = clients.get(new Pair<>(politicalParty, vote.getTable()));
+            List<InspectionClient> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getTable()));
             clientsToNotify.forEach(inspectionClient -> {
                 try{
                     inspectionClient.notifyVote();
@@ -66,5 +61,5 @@ public class InspectionServiceImpl extends UnicastRemoteObject implements Inspec
 //                }
 //            }
 //        }
-    }
+    }*/
 }

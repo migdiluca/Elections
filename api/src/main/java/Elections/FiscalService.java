@@ -9,7 +9,7 @@ import Elections.Models.PoliticalParty;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface InspectionService extends Remote {
+public interface FiscalService extends Remote {
 
     String SERVICE_NAME = "inspection_service";
 

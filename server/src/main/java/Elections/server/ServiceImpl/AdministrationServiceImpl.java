@@ -39,4 +39,16 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
             throw new ElectionsNotStartedException();
         electionState.setElectionState(ElectionState.FINISHED);
     }
+
+    private void notifyEndToClients(){
+        electionState.getFiscalClients().forEach((pair,clientList) -> {
+            clientList.forEach(client -> {
+                try{
+                    client.endClient();
+                } catch (RemoteException e){
+                    System.out.println("Remote exception while ending client");
+                }
+            });
+        });
+    }
 }
