@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 
 public class AdministrationServiceImpl extends UnicastRemoteObject implements AdministrationService {
 
-    private Election electionState;
+    private Election election;
     private ExecutorService exService;
 
     public AdministrationServiceImpl(int port) throws RemoteException {
@@ -24,22 +24,26 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
         exService = Executors.newFixedThreadPool(12);
     }
 
+    Election getElection() {
+        return election;
+    }
+
     public AdministrationServiceImpl(Election electionState) throws RemoteException {
-        this.electionState = electionState;
+        this.election = electionState;
         exService = Executors.newFixedThreadPool(12);
     }
 
     @Override
     public synchronized void openElections() throws ElectionStateException, RemoteException {
-        if(electionState.getElectionState().equals(ElectionState.FINISHED))
+        if (election.getElectionState().equals(ElectionState.FINISHED))
             throw new AlreadyFinishedElectionException();
-        electionState.setElectionState(ElectionState.RUNNING);
+        election.setElectionState(ElectionState.RUNNING);
     }
 
     @Override
     public ElectionState getElectionState() throws RemoteException, ServiceException {
-        Future<ElectionState> future = exService.submit(() -> electionState.getElectionState());
-        ElectionState state = null;
+        Future<ElectionState> future = exService.submit(() -> election.getElectionState());
+        ElectionState state;
         try {
             state = future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -50,21 +54,21 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
 
     @Override
     public synchronized void finishElections() throws ElectionStateException, RemoteException {
-        if(electionState.getElectionState().equals(ElectionState.NOT_STARTED))
+        if (election.getElectionState().equals(ElectionState.NOT_STARTED))
             throw new ElectionsNotStartedException();
-        if(electionState.getElectionState().equals(ElectionState.FINISHED)){
+        if (election.getElectionState().equals(ElectionState.FINISHED)) {
             throw new AlreadyFinishedElectionException();
         }
-        electionState.setElectionState(ElectionState.FINISHED);
+        election.setElectionState(ElectionState.FINISHED);
         notifyEndToClients();
     }
 
-    private void notifyEndToClients(){
-        electionState.getFiscalClients().forEach((pair,clientList) -> {
+    private void notifyEndToClients() {
+        election.getFiscalClients().forEach((pair, clientList) -> {
             clientList.forEach(client -> {
-                try{
+                try {
                     client.endClient();
-                } catch (RemoteException e){
+                } catch (RemoteException e) {
                     System.out.println("Remote exception while ending client");
                 }
             });
