@@ -8,17 +8,22 @@ import Elections.Models.ElectionState;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AdministrationServiceImpl extends UnicastRemoteObject implements AdministrationService {
 
     private Election electionState;
+    private ExecutorService exService;
 
     public AdministrationServiceImpl(int port) throws RemoteException {
         super(port);
+        exService = Executors.newFixedThreadPool(12);
     }
 
     public AdministrationServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
+        exService = Executors.newFixedThreadPool(12);
     }
 
     @Override

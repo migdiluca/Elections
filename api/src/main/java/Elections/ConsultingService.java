@@ -3,6 +3,7 @@ package Elections;
 
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
+import Elections.Exceptions.ServiceException;
 import Elections.Models.Dimension;
 import Elections.Models.PoliticalParty;
 import javafx.util.Pair;
@@ -24,9 +25,9 @@ public interface ConsultingService extends Remote {
      * @throws ElectionsNotStartedException (o un nombre mas piolin)
      * If elections are running, answers must be FPTP else respect each voting.
      */
-    List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException;
+    List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException, ServiceException;
 
-    List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException;
+    List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException, ServiceException;
 
-    List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException;
+    List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException, ServiceException;
 }
