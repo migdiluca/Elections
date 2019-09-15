@@ -41,6 +41,7 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
             throw new AlreadyFinishedElectionException();
         }
         electionState.setElectionState(ElectionState.FINISHED);
+        notifyEndToClients();
     }
 
     private void notifyEndToClients(){

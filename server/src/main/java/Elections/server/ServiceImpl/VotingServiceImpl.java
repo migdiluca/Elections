@@ -42,7 +42,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
                 try{
                     inspectionClient.notifyVote();
                 } catch (RemoteException e){
-                    System.out.println("Remote exception on server side for InspectionService");
+                    System.out.println("Remote exception while notifying votes");
                 }
             });
         });
