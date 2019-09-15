@@ -49,9 +49,6 @@ public class ManagementClient {
             System.exit(1);
         }
 
-        System.out.println(client.getAction().name());
-        System.out.println(client.getIp());
-
         // iniciamos la conección con el servidor
         String[] serverAddr = client.getIp().split(":", -1);
         final AdministrationService as;

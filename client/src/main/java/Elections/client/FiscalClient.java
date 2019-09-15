@@ -60,10 +60,6 @@ public class FiscalClient implements InspectionClient {
             exit(1);
         }
 
-        System.out.println(client.getIp());
-        System.out.println(client.getParty().name());
-        System.out.println(client.getTable());
-
         // Iniciamos la conección con el servidor
         String[] serverAddr = client.getIp().split(":", -1);
         final FiscalService is;
