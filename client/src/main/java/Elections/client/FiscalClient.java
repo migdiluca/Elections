@@ -108,18 +108,18 @@ public class FiscalClient implements InspectionClient {
     }
 
     @Override
-    public void notifyVote() {
+    public void notifyVote() throws RemoteException {
         System.out.println("New vote for " + party.name() + " on pooling place " + table.toString());
     }
 
     @Override
-    public void endClient() {
+    public void endClient() throws RemoteException {
         System.out.println("Elections finished");
         exit(0);
     }
 
     @Override
-    public void submitError(ElectionState electionState) {
+    public void submitError(ElectionState electionState) throws RemoteException {
         if(electionState.equals(ElectionState.RUNNING)) {
             System.out.println("Elections already started");
         }

@@ -27,8 +27,12 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
 
     @Override
     public void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException {
-        if(!electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
-            inspectionClient.submitError(electionState.getElectionState());
+        if(!electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
+            try {
+                inspectionClient.submitError(electionState.getElectionState());
+            } catch (RemoteException e) {
+                System.out.println("Cannot reach client");
+            }
             return;
         }
 
@@ -45,6 +49,7 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
         } catch (InterruptedException | ExecutionException e) {
             throw new ElectionStateException(e.getMessage());
         }
+
     }
 
 }
