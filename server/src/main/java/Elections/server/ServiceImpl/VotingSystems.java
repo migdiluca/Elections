@@ -1,6 +1,7 @@
 package Elections.server.ServiceImpl;
 
 import Elections.Models.PoliticalParty;
+import Elections.Models.Province;
 import Elections.Models.Vote;
 import javafx.util.Pair;
 
@@ -9,7 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class VotingSystems {
 
@@ -108,5 +111,109 @@ public class VotingSystems {
             map.put(k, list);
         });
         return map;
+    }
+
+    private final int WINNERS_PER_PROVINCE = 5;
+
+    public List<Pair<BigDecimal, PoliticalParty>> stVoteProvicialLevel(Province prov) {
+         Stream<Vote> provinceStream = votes.stream()
+                .filter(x -> x.getProvince() == prov);
+        long provinceCount = provinceStream.count();
+        Map<PoliticalParty, List<Vote>> masterMap = provinceStream.collect(Collectors.groupingBy(vote -> vote.getPreferredParties().get(0)));
+        return stVoteProvicialLevelREC(masterMap, new ArrayList<>(), provinceCount, WINNERS_PER_PROVINCE);
+    }
+
+    /**
+     * Al inicio de cada iteración se recalcula el thresh hold y al final se recalculan los asientos disponibles
+     * */
+    private List<Pair<BigDecimal, PoliticalParty>> stVoteProvicialLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> notCountingParties, long totalVotes, int availableSeats) {
+        // caso base, no hay que iterar más
+        if (availableSeats == 0) {
+            return new ArrayList<>();
+        }
+        // array para los ganadores de esta iteración;
+        List<Pair<BigDecimal, PoliticalParty>> winnerPPs = new ArrayList<>();
+
+        // Calculamos el mínimo de votos requerido para ser elegido,
+        // esto es igual al máximo de votos que se pueden adquirir por candidato.
+        // El porcentaje de votos que sobrepasan este threshhold es redistribuido entre las segundas y terceras opciones
+        double threshhold = totalVotes / availableSeats; // redondeo??
+
+        // Mapa para hacer un buffer de los votos de seunga/tercera opción a ditribuir.
+        // esperamos para distribuir cosa de que recién al final de la iteración se consideren los cambios
+        Map<PoliticalParty, LongAdder> secondChoiceBuffer = new HashMap<>();
+        for (PoliticalParty pp : PoliticalParty.values()) { secondChoiceBuffer.put(pp, new LongAdder()); }
+
+        // Para cada candidato, si sobre pasa el límite, contamos las segundas/terceras opciones de sus votos
+        // para luego distribuirlos
+        availableSeats = threshholdCounting(masterMap, threshhold, totalVotes, winnerPPs, notCountingParties, availableSeats, secondChoiceBuffer);
+        if (availableSeats == 0) {
+            // terminamos
+            // todo ??
+        } else if (availableSeats < 0 ) {
+            // no se si es posible este caso
+            // todo ??
+            
+        }
+
+        // retornamos la lista de winners concatenada con los winners de otras iteraciones
+        winnerPPs.addAll(stVoteProvicialLevelREC());
+        return winnerPPs;
+    }
+
+    private int threshholdCounting(Map<PoliticalParty, List<Vote>> masterMap, double threshhold, long totalVotes, List<Pair<BigDecimal, PoliticalParty>> winnerPPs, List<PoliticalParty> notCountingParties, int availableSeats, Map<PoliticalParty, LongAdder> secondChoiceBuffer) {
+        // Por cada PoliticalParty nos fijamos si alguno sobre pasa el límite
+        for (PoliticalParty pp: masterMap.keySet()) {
+            long votesForThisPP = masterMap.get(pp).size();
+            if ( votesForThisPP > threshhold) {
+                // si sobre pasa
+                winnerPPs.add(new Pair<>(new BigDecimal(votesForThisPP / totalVotes), pp)); // agregamos a la lista de los que ya ganaron
+                notCountingParties.add(pp); // agregamos a la lista de los que no van a contar para la siguiente iteración
+                availableSeats--;           // hay 1 asiento menos
+                // agregamos los votos al buffer
+                bufferExtraVotes(masterMap.get(pp), notCountingParties, secondChoiceBuffer);
+            } else if (votesForThisPP == threshhold) {
+                // si es igual
+                winnerPPs.add(new Pair<>(new BigDecimal(votesForThisPP / totalVotes), pp)); // agregamos a la lista de los que ya ganaron
+                notCountingParties.add(pp); // agregamos a la lista de los que no van a contar para la siguiente iteración
+                availableSeats--;           // hay 1 asiento menos
+            }
+            // else: votesForThisPP < threshhold => después decidimos qué hacer
+        }
+        return availableSeats;
+    }
+
+    /**
+     * Itero por todos los votos de este partido.
+     * Considero la segunda o tercera opción en base a los partidos que no fueron eliminados y no ganaron
+     * Si no hay candidato disponible estos votos no aportan a otros candidatos
+     * y tampoco modifican el promedio que será agregado a los otros partidos
+     */
+    private void bufferExtraVotes(List<Vote> ppVotes, List<PoliticalParty> notCountingParties, Map<PoliticalParty, LongAdder> extrasBuffer) {
+        // por cada voto de este candidato
+        for (Vote vote: ppVotes) {
+            // buscamos la segunda o tercera opción
+            List<PoliticalParty> preferredParties = vote.getPreferredParties();
+            if (preferredParties.size() < 2) {
+                break; // votó uno solo y entonces su voto no es transferible
+            }
+            // si llegué hasta acá, por lo menos votó a 2 candidatos
+            if (!notCountingParties.contains(preferredParties.get(1))) {
+                // entonces este voto si cuenta!
+                extrasBuffer.get(preferredParties.get(1)).increment();
+                break;
+            }
+            // si llegúe hasta acá, tiene por lo menos 2 votos, pero el segundo no sirve
+            // vemos si tiene tercer voto
+            if (preferredParties.size() < 3) {
+                break; // no tuvo tercer voto y entonces su voto no es transferible
+            }
+            //si llegúe hasta acá, tiene 3 votos
+            if (notCountingParties.contains(preferredParties.get(2))) {
+                break; // entonces el tercer voto no sirve
+            }
+            // si llegúe hasta acá, el tercer voto sirve
+            extrasBuffer.get(preferredParties.get(2)).increment();
+        }
     }
 }

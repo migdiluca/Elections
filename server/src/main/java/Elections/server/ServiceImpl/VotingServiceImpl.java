@@ -29,4 +29,5 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         }
         votes.forEach(vote -> electionState.addToVoteList(vote));
     }
+
 }
