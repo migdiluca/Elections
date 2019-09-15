@@ -37,6 +37,9 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     public void finishElections() throws ElectionStateException, RemoteException {
         if(electionState.getElectionState().equals(ElectionState.NOT_STARTED))
             throw new ElectionsNotStartedException();
+        if(electionState.getElectionState().equals(ElectionState.FINISHED)){
+            throw new AlreadyFinishedElectionException();
+        }
         electionState.setElectionState(ElectionState.FINISHED);
     }
 }

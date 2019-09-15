@@ -14,7 +14,7 @@ import java.rmi.registry.Registry;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
-    private static final int port = 8090;
+    private static final int port = 1099;
 
     public static void main(String[] args) throws RemoteException {
 
