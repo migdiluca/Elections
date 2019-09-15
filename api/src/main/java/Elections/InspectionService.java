@@ -15,8 +15,8 @@ public interface InspectionService extends Remote {
 
     /**
      * If already open
-     * @throws ElectionsAlreadyStartedException or
-     * @throws AlreadyFinishedElectionException
+     * @throws ElectionsAlreadyStartedException if elections have started
+     * @throws AlreadyFinishedElectionException if elections have finished
      */
     void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException;
 
