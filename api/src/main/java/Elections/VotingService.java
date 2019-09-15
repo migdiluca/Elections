@@ -23,4 +23,13 @@ public interface VotingService extends Remote {
      * @param votes List with votes to be counted
      */
     void vote(List<Vote> votes) throws RemoteException, ElectionStateException;
+
+    /**
+     * We suggest that no more than bulkSize votes are sent per request
+     * If already open
+     * @throws ElectionsAlreadyStartedException or
+     * @throws AlreadyFinishedElectionException can be thrown
+     * @param vote vote to be counted
+     */
+    void vote(Vote vote) throws ElectionStateException, RemoteException;
 }
