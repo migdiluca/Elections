@@ -19,6 +19,6 @@ public interface FiscalService extends Remote {
      * @throws ElectionsAlreadyStartedException if elections have started
      * @throws AlreadyFinishedElectionException if elections have finished
      */
-    void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException, ServiceException;
+    void addInspector(InspectionClient inspectionClient, PoliticalParty party, int table) throws RemoteException, ElectionStateException;
 
 }

@@ -3,6 +3,7 @@ package Elections.client;
 import Elections.AdministrationService;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
 import Elections.VotingService;
 import org.kohsuke.args4j.Option;
@@ -84,7 +85,7 @@ public class ManagementClient {
             }
         } catch (RemoteException ex) {
             System.out.println("Could not reach service");
-        } catch (ElectionStateException ex) {
+        } catch (ElectionStateException | ServiceException ex) {
             ex.getMessage();
         }
     }
