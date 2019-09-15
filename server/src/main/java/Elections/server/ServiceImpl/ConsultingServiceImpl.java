@@ -29,7 +29,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
     }
 
     @Override
-    public List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException, ServiceException {
+    public List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException {
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
@@ -37,12 +37,12 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ServiceException();
+            throw new ElectionStateException(e.getMessage());
         }
     }
 
     @Override
-    public List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException, ServiceException {
+    public List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException {
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
@@ -50,12 +50,12 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ServiceException();
+            throw new ElectionStateException(e.getMessage());
         }
     }
 
     @Override
-    public List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException, ServiceException {
+    public List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException {
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
@@ -63,13 +63,13 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ServiceException();
+            throw new ElectionStateException(e.getMessage());
         }
 
     }
 
 
-    private List<Pair<BigDecimal, PoliticalParty>> notCompletedResults() throws RemoteException, ElectionStateException, ServiceException {
+    private List<Pair<BigDecimal, PoliticalParty>> notCompletedResults() throws RemoteException, ElectionStateException {
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
@@ -86,7 +86,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ServiceException();
+            throw new ElectionStateException(e.getMessage());
         }
     }
 }

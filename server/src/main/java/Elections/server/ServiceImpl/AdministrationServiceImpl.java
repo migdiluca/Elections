@@ -4,6 +4,7 @@ import Elections.AdministrationService;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
+import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
 
 import java.rmi.RemoteException;
@@ -44,13 +45,13 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     }
 
     @Override
-    public ElectionState getElectionState() throws RemoteException {
+    public ElectionState getElectionState() throws RemoteException, ServiceException {
         Future<ElectionState> future = exService.submit(() -> electionState.getElectionState());
         ElectionState state = null;
         try {
             state = future.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            throw new ServiceException();
         }
         return state;
     }

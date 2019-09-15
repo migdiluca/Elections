@@ -3,6 +3,7 @@ package Elections;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
+import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
 
 import java.rmi.Remote;
@@ -21,7 +22,7 @@ public interface AdministrationService extends Remote {
     /**
      * Gets the election state
      */
-    ElectionState getElectionState() throws RemoteException;
+    ElectionState getElectionState() throws RemoteException, ServiceException;
 
     /**
      * Finish elections, users cannot vote once this function runs
