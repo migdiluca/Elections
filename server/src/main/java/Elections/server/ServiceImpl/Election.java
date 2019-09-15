@@ -22,6 +22,7 @@ public class Election {
 
     private final Object helperA = 0;
     private final Object helperB = 0;
+    private final String mutexState = "Election state mutex";
 
     public Election() {
         electionState = ElectionState.NOT_STARTED;
@@ -74,5 +75,17 @@ public class Election {
 
     Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> getDeskFinalResults() {
         return deskFinalResults;
+    }
+
+    public void setNationalFinalResults(List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults) {
+        this.nationalFinalResults = nationalFinalResults;
+    }
+
+    public void setProvinceFinalResults(Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults) {
+        this.provinceFinalResults = provinceFinalResults;
+    }
+
+    public void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
+        this.deskFinalResults = deskFinalResults;
     }
 }
