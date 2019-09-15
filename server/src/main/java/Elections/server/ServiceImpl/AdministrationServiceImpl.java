@@ -30,18 +30,10 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     }
 
     @Override
-    public void openElections() throws ElectionStateException, RemoteException {
-//        Future<?> future = exService.submit(() -> {
-            if (electionState.getElectionState().equals(ElectionState.FINISHED))
-                throw new AlreadyFinishedElectionException();
-            electionState.setElectionState(ElectionState.RUNNING);
-//            return null;
-//        });
-//        try {
-//            future.get();
-//        } catch (InterruptedException | ExecutionException e) {
-//            throw new ElectionStateException(e.getMessage());
-//        }
+    public synchronized void openElections() throws ElectionStateException, RemoteException {
+        if(electionState.getElectionState().equals(ElectionState.FINISHED))
+            throw new AlreadyFinishedElectionException();
+        electionState.setElectionState(ElectionState.RUNNING);
     }
 
     @Override
@@ -57,12 +49,25 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     }
 
     @Override
-    public void finishElections() throws ElectionStateException, RemoteException {
-        if (electionState.getElectionState().equals(ElectionState.NOT_STARTED))
+    public synchronized void finishElections() throws ElectionStateException, RemoteException {
+        if(electionState.getElectionState().equals(ElectionState.NOT_STARTED))
             throw new ElectionsNotStartedException();
-        if (electionState.getElectionState().equals(ElectionState.FINISHED)) {
+        if(electionState.getElectionState().equals(ElectionState.FINISHED)){
             throw new AlreadyFinishedElectionException();
         }
         electionState.setElectionState(ElectionState.FINISHED);
+        notifyEndToClients();
+    }
+
+    private void notifyEndToClients(){
+        electionState.getFiscalClients().forEach((pair,clientList) -> {
+            clientList.forEach(client -> {
+                try{
+                    client.endClient();
+                } catch (RemoteException e){
+                    System.out.println("Remote exception while ending client");
+                }
+            });
+        });
     }
 }

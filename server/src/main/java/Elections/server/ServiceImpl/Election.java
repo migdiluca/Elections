@@ -1,5 +1,6 @@
 package Elections.server.ServiceImpl;
 
+import Elections.InspectionClient;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -20,6 +21,8 @@ public class Election {
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
+    private Map<Pair<PoliticalParty, Integer>,List<InspectionClient>> FiscalClients;
+
     private final Object mutexVotesA = "Vote list mutex";
     private final Object mutexVotesB = "Partial votes list mutex";
     private final Object mutexState = "Election state mutex";
@@ -31,6 +34,8 @@ public class Election {
         for (int i = 0; i < partialVotes.length; i++) {
             partialVotes[i] = new LongAdder();
         }
+
+        FiscalClients = Collections.synchronizedMap(new HashMap<>());
 
         nationalFinalResults = new ArrayList<>();
         provinceFinalResults = new HashMap<>();
@@ -67,6 +72,10 @@ public class Election {
 
     List<Pair<BigDecimal, PoliticalParty>> getNationalFinalResults() {
         return nationalFinalResults;
+    }
+
+    public Map<Pair<PoliticalParty, Integer>, List<InspectionClient>> getFiscalClients() {
+        return FiscalClients;
     }
 
     Map<Province, List<Pair<BigDecimal, PoliticalParty>>> getProvinceFinalResults() {

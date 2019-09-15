@@ -2,7 +2,7 @@ package Elections.server;
 
 import Elections.AdministrationService;
 import Elections.ConsultingService;
-import Elections.InspectionService;
+import Elections.FiscalService;
 import Elections.VotingService;
 import Elections.server.ServiceImpl.*;
 import org.slf4j.Logger;
@@ -24,14 +24,14 @@ public class Server {
 
         AdministrationService as = new AdministrationServiceImpl(electionState);
         VotingService vs = new VotingServiceImpl(electionState);
-        InspectionService is = new InspectionServiceImpl(electionState);
+        FiscalService is = new FiscalServiceImpl(electionState);
         ConsultingService cs = new ConsultingServiceImpl(electionState);
 
         final Registry registry = LocateRegistry.createRegistry(port);
 
         registry.rebind(AdministrationService.SERVICE_NAME, as);
         registry.rebind(VotingService.SERVICE_NAME, vs);
-        registry.rebind(InspectionService.SERVICE_NAME, is);
+        registry.rebind(FiscalService.SERVICE_NAME, is);
         registry.rebind(ConsultingService.SERVICE_NAME, cs);
 
         System.out.println("Server up and running: " + registry);
