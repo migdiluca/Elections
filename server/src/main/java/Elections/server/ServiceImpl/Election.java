@@ -23,9 +23,9 @@ public class Election {
 
     private Map<Pair<PoliticalParty, Integer>,List<InspectionClient>> FiscalClients;
 
-    private final Object helperA = 0;
-    private final Object helperB = 0;
-    private final String mutexState = "Election state mutex";
+    private final Object mutexVotesA = "Vote list mutex";
+    private final Object mutexVotesB = "Partial votes list mutex";
+    private final Object mutexState = "Election state mutex";
 
     public Election() {
         electionState = ElectionState.NOT_STARTED;
@@ -46,10 +46,10 @@ public class Election {
     }
 
     void addToVoteList(Vote vote) {
-        synchronized (helperA) {
+        synchronized (mutexVotesA) {
             votingList.add(vote);
         }
-        synchronized (helperB) {
+        synchronized (mutexVotesB) {
             partialVotes[vote.getPreferredParties().get(0).ordinal()].increment();
         }
     }

@@ -22,7 +22,7 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     }
 
     @Override
-    public void openElections() throws ElectionStateException, RemoteException {
+    public synchronized void openElections() throws ElectionStateException, RemoteException {
         if(electionState.getElectionState().equals(ElectionState.FINISHED))
             throw new AlreadyFinishedElectionException();
         electionState.setElectionState(ElectionState.RUNNING);
@@ -34,9 +34,12 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
     }
 
     @Override
-    public void finishElections() throws ElectionStateException, RemoteException {
+    public synchronized void finishElections() throws ElectionStateException, RemoteException {
         if(electionState.getElectionState().equals(ElectionState.NOT_STARTED))
             throw new ElectionsNotStartedException();
+        if(electionState.getElectionState().equals(ElectionState.FINISHED)){
+            throw new AlreadyFinishedElectionException();
+        }
         electionState.setElectionState(ElectionState.FINISHED);
     }
 

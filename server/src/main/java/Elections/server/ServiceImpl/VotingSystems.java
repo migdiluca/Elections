@@ -157,7 +157,7 @@ public class VotingSystems {
         }
 
         // retornamos la lista de winners concatenada con los winners de otras iteraciones
-        winnerPPs.addAll(stVoteProvicialLevelREC());
+        //winnerPPs.addAll(stVoteProvicialLevelREC());
         return winnerPPs;
     }
 

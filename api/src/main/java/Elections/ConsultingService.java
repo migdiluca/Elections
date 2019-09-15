@@ -20,13 +20,25 @@ public interface ConsultingService extends Remote {
     String SERVICE_NAME = "consulting_service";
 
     /**
-     * If elections did not start
-     * @throws ElectionsNotStartedException (o un nombre mas piolin)
+     * gets national results
      * If elections are running, answers must be FPTP else respect each voting.
+     * @throws ElectionsNotStartedException if elections did not start
      */
     List<Pair<BigDecimal, PoliticalParty>> checkResultNational() throws RemoteException, ElectionStateException;
 
+    /**
+     * gets province results
+     * If elections are running, answers must be FPTP else respect each voting.
+     * @throws ElectionsNotStartedException if elections did not start
+     * @param province the province enum corresponding to which province results are wanted
+     */
     List<Pair<BigDecimal, PoliticalParty>> checkResultProvince(Province province) throws RemoteException, ElectionStateException;
 
+    /**
+     * gets province results
+     * If elections are running, answers must be FPTP else respect each voting.
+     * @throws ElectionsNotStartedException if elections did not start
+     * @param desk the desk number
+     */
     List<Pair<BigDecimal, PoliticalParty>> checkResultDesk(int desk) throws RemoteException, ElectionStateException;
 }

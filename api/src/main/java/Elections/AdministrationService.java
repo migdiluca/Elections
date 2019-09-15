@@ -13,16 +13,20 @@ public interface AdministrationService extends Remote {
     String SERVICE_NAME = "administration_service";
 
     /**
-     * If already finished
-     * @throws AlreadyFinishedElectionException (o un nombre mas piolin)
+     * Open elections
+     * @throws AlreadyFinishedElectionException if elections already finished
      */
     void openElections() throws RemoteException, ElectionStateException;
 
+    /**
+     * Gets the election state
+     */
     ElectionState getElectionState() throws RemoteException;
 
     /**
-     * If elections did not start
-     * @throws ElectionsNotStartedException (o un nombre mas piolin)
+     * Finish elections, users cannot vote once this function runs
+     * @throws ElectionsNotStartedException if elections did not start
+     * @throws AlreadyFinishedElectionException if elections already finished
      */
     void finishElections() throws RemoteException, ElectionStateException;
 
