@@ -20,8 +20,8 @@ public class Election {
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
-    private final Object helperA = 0;
-    private final Object helperB = 0;
+    private final Object mutexVotesA = "Vote list mutex";
+    private final Object mutexVotesB = "Partial votes list mutex";
     private final String mutexState = "Election state mutex";
 
     public Election() {
@@ -41,10 +41,10 @@ public class Election {
     }
 
     void addToVoteList(Vote vote) {
-        synchronized (helperA) {
+        synchronized (mutexVotesA) {
             votingList.add(vote);
         }
-        synchronized (helperB) {
+        synchronized (mutexVotesB) {
             partialVotes[vote.getPreferredParties().get(0).ordinal()].increment();
         }
     }
