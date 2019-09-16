@@ -25,7 +25,6 @@ public class Election {
 
     private final Object mutexVotesA = "Vote list mutex";
     private final Object mutexVotesB = "Partial votes list mutex";
-    private final Object mutexState = "Election state mutex";
 
     public Election() {
         electionState = ElectionState.NOT_STARTED;
@@ -74,7 +73,7 @@ public class Election {
         return nationalFinalResults;
     }
 
-    public Map<Pair<PoliticalParty, Integer>, List<FiscalCallBack>> getFiscalClients() {
+    Map<Pair<PoliticalParty, Integer>, List<FiscalCallBack>> getFiscalClients() {
         return FiscalClients;
     }
 
@@ -86,19 +85,19 @@ public class Election {
         return deskFinalResults;
     }
 
-    public void setNationalFinalResults(List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults) {
+    void setNationalFinalResults(List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults) {
         this.nationalFinalResults = nationalFinalResults;
     }
 
-    public void setProvinceFinalResults(Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults) {
+    void setProvinceFinalResults(Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults) {
         this.provinceFinalResults = provinceFinalResults;
     }
 
-    public void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
+    void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
         this.deskFinalResults = deskFinalResults;
     }
 
-    public List<Vote> getVotingList() {
+    List<Vote> getVotingList() {
         return votingList;
     }
 }
