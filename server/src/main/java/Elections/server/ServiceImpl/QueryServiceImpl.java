@@ -32,7 +32,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-                return p != null ? p : electionState.getNationalFinalResults();
+                return p != null ? new ArrayList<>() : electionState.getNationalFinalResults();
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -45,7 +45,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-                return p != null ? p : electionState.getProvinceFinalResults().get(province);
+                return p != null ? new ArrayList<>() : electionState.getProvinceFinalResults().get(province);
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -58,7 +58,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-                return p != null ? p : electionState.getDeskFinalResults().get(desk);
+                return p != null ? new ArrayList<>() : electionState.getDeskFinalResults().get(desk);
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -73,7 +73,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
                     throw new ElectionsNotStartedException();
-                } else if (electionState.getElectionState().equals(ElectionState.RUNNING)) {
+                } else if (electionState.getAmountOfVotes() > 0 && electionState.getElectionState().equals(ElectionState.RUNNING)) {
                     List<Pair<BigDecimal, PoliticalParty>> retList = new ArrayList<>();
                     for (int i = 0; i < PoliticalParty.values().length; i++) {
                         PoliticalParty p = PoliticalParty.values()[i];

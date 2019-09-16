@@ -44,6 +44,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         });
         try {
             future.get();
+            logger.info("Total votes uploaded by now: " + electionState.getVotingList().size());
         } catch (InterruptedException | ExecutionException  e) {
             throw new ElectionStateException(e.getCause().getMessage());
         }

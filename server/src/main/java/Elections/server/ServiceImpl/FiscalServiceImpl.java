@@ -5,7 +5,10 @@ import Elections.FiscalCallBack;
 import Elections.FiscalService;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
+import Elections.server.Server;
 import javafx.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -19,6 +22,7 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
 
     private Election electionState;
     private ExecutorService exService;
+    private static Logger logger = LoggerFactory.getLogger(Server.class);
 
     public FiscalServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
@@ -46,6 +50,7 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
         });
         try {
             future.get();
+            logger.info("A fiscal has been registered in desk " + desk + "for party" + party.name());
         } catch (InterruptedException | ExecutionException e) {
             throw new ElectionStateException(e.getCause().getMessage());
         }

@@ -57,7 +57,6 @@ public class VotingSystemsTest {
     @Test
     public void alternativeVoteNationalLevel() throws Exception {
         List<Pair<BigDecimal, PoliticalParty>> result = votingSystems.alternativeVoteNationalLevel();
-        System.out.println(result);
 
         /*
          * Los resultados esperados para este sistema fueron obtenidos con el siguiente motor: http://condorcet.ericgorr.net
