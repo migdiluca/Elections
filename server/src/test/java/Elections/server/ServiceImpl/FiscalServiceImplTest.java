@@ -31,7 +31,7 @@ public class FiscalServiceImplTest {
             election.setElectionState(ElectionState.RUNNING);
             fiscalService = new FiscalServiceImpl(election);
 
-            service = Executors.newFixedThreadPool(2);
+            service = Executors.newFixedThreadPool(200);
         } catch (RemoteException e) {
             System.out.println("remote exception error");
         }
