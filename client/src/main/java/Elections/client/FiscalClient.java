@@ -98,9 +98,9 @@ public class FiscalClient implements InspectionClient {
         System.out.println("Fiscal of " + client.getParty().name() + " registered on polling place " + client.getTable());
 
         // todo: registrar funcion para que me avise cuando cerraron las votaciones asi termino el programa?
-        while(true){
-
-        }
+//        while(true){
+//
+//        }
     }
 
     @Override
@@ -122,6 +122,6 @@ public class FiscalClient implements InspectionClient {
         else if(electionState.equals(ElectionState.FINISHED)) {
             System.out.println("Elections already finished");
         }
-        endClient();
+        exit(1);
     }
 }

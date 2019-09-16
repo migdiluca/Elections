@@ -73,9 +73,7 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
 
         this.votingSystems = new VotingSystems(election.getVotingList());
         election.setDeskFinalResults(votingSystems.calculateDeskResults());
-        List<Pair<BigDecimal, PoliticalParty>> list =  new ArrayList<>();
-        list.add(votingSystems.alternativeVoteNationalLevel());
-        election.setNationalFinalResults(list);
+        election.setNationalFinalResults(votingSystems.alternativeVoteNationalLevel());
 
         //FIXME: hardcodeado para testeo
 

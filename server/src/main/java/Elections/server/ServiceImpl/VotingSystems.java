@@ -62,7 +62,7 @@ public class VotingSystems {
     /*
         Retorna Pair (porcentaje de votos, partido politico) del ganador de la eleccion
      */
-    private Pair<BigDecimal, PoliticalParty> alternativeVoteNationalLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, int total) {
+    private List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, int total) {
         // ordenamos el mapa
         // podria haber usado los metodos max/min de streams pero seria mas conveniente ordenarlo de una y no 2 veces
         List<Map.Entry<PoliticalParty, List<Vote>>> sortedEntries = masterMap.entrySet().stream()
@@ -70,10 +70,9 @@ public class VotingSystems {
                 .collect(Collectors.toList());
         if ((sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
             // hay un ganador
-            return new Pair<>(
-                    new BigDecimal(sortedEntries.get(0).getValue().size() / (double) total).setScale(2, BigDecimal.ROUND_DOWN),
-                    sortedEntries.get(0).getKey()
-            );
+            return sortedEntries.stream().map((e) -> new Pair<BigDecimal, PoliticalParty>(
+                    new BigDecimal(e.getValue().size() / (double) total).setScale(2, BigDecimal.ROUND_DOWN),
+                    e.getKey())).collect(Collectors.toList());
         }
         Map.Entry<PoliticalParty, List<Vote>> loser = sortedEntries.get(sortedEntries.size() - 1);
         /* todo: el perdedor podria haber empatado con otro candidato -> alternativas:
@@ -91,7 +90,7 @@ public class VotingSystems {
     /*
        Retorna Pair(porcentaje de votos, partido politico) del ganador de la eleccion
     */
-    public Pair<BigDecimal, PoliticalParty> alternativeVoteNationalLevel() {
+    public List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
         Map<PoliticalParty, List<Vote>> masterMap = votes.stream()
                 .collect(Collectors.groupingBy(vote -> vote.getPreferredParties().get(0)));
         return alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
