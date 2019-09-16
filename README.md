@@ -10,12 +10,12 @@
 3. Ejecutar el comando **chmod u+x** sobre los scripts *run-*.sh* para otorgarles permiso de ejecuccion.
 Puede utilizar el script run-Permits.sh el cual le otorgara permisos a todos los demas scripts.
     ### Disponibilizar el servidor de elección
-    Correr el script **run-server.sh**
+    - Correr el script **run-server.sh**
     ### Clientes de elección
-    Correr el script **run-FiscalClient.sh** para fiscalizar una mesa
-    Correr el script **run-ManagementClient.sh** para administrar la elección
-    Correr el script **run-QueryClient.sh** para consultar resultados de la elección
-    Correr el script **run-VoteClient.sh** para cargar votos en el sistema de elección 
+    - Correr el script **run-FiscalClient.sh** para fiscalizar una mesa.
+    - Correr el script **run-ManagementClient.sh** para administrar la elección.
+    - Correr el script **run-QueryClient.sh** para consultar resultados de la elección.
+    - Correr el script **run-VoteClient.sh** para cargar votos en el sistema de elección. 
     
     
     
