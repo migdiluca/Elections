@@ -6,9 +6,6 @@ import Elections.Models.ElectionState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutorService;
@@ -16,7 +13,6 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AdministrationServiceImplTest {
 
     private AdministrationServiceImpl administrationService;
@@ -27,7 +23,6 @@ public class AdministrationServiceImplTest {
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
         try {
             Election election = new Election();
             administrationService = new AdministrationServiceImpl(election);
