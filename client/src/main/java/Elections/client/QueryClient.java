@@ -1,8 +1,8 @@
 package Elections.client;
 
 import CSVUtils.CSVWrite;
-import Elections.AdministrationService;
-import Elections.ConsultingService;
+import Elections.ManagementService;
+import Elections.QueryService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -27,8 +27,8 @@ public class QueryClient {
     @Option(name = "-Dstate", forbids = {"-Did"}, aliases = "--stateName", usage = "Name of province to query")
     private Province state;
 
-    @Option(name = "-Did", forbids = {"-Dstate"}, aliases = "--pollingPlaceNumber", usage = "Table number to query")
-    private Integer table;
+    @Option(name = "-Did", forbids = {"-Dstate"}, aliases = "--pollingPlaceNumber", usage = "Desk number to query")
+    private Integer desk;
 
     @Option(name = "-DoutPath", aliases = "--file", usage = "Fully qualified path and name of file to output results.", required = true)
     private String votesFileName;
@@ -49,12 +49,12 @@ public class QueryClient {
         this.state = state;
     }
 
-    public Optional<Integer> getTable() {
-        return Optional.ofNullable(this.table);
+    public Optional<Integer> getDesk() {
+        return Optional.ofNullable(this.desk);
     }
 
-    public void setTable(Integer table) {
-        this.table = table;
+    public void setDesk(Integer desk) {
+        this.desk = desk;
     }
 
     public String getVotesFileName() {
@@ -77,11 +77,11 @@ public class QueryClient {
         // si llegamos aca esta recibimos los argumentos de manera correcta
         // iniciamos la conección con el servicio de query
         String[] arr = client.getIp().split(":", -1);
-        final ConsultingService cs;
-        final AdministrationService as;
+        final QueryService cs;
+        final ManagementService as;
         try {
             final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
-            cs = (ConsultingService) registry.lookup(ConsultingService.SERVICE_NAME);
+            cs = (QueryService) registry.lookup(QueryService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
             return;
@@ -92,15 +92,15 @@ public class QueryClient {
 
         List<Pair<BigDecimal, PoliticalParty>> results = null;
         try {
-            if (client.getTable().isPresent()) {
-                results = cs.checkResultDesk(client.getTable().get());
+            if (client.getDesk().isPresent()) {
+                results = cs.checkResultDesk(client.getDesk().get());
             } else if (client.getState().isPresent()) {
                 results = cs.checkResultProvince(client.getState().get());
             } else {
                 results = cs.checkResultNational();
             }
         } catch (RemoteException e) {
-            System.out.println("There was an error retriving results from" + ConsultingService.SERVICE_NAME);
+            System.out.println("There was an error retriving results from" + QueryService.SERVICE_NAME);
             return;
         } catch (ElectionStateException e) {
             System.out.println(e.getMessage());

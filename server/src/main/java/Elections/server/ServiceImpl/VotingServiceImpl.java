@@ -3,7 +3,7 @@ package Elections.server.ServiceImpl;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
-import Elections.InspectionClient;
+import Elections.FiscalCallBack;
 import Elections.Models.ElectionState;
 import Elections.Models.Vote;
 import Elections.VotingService;
@@ -63,7 +63,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     private void notifyVoteToClients(Vote vote) {
         exService.submit(() -> {
             vote.getPreferredParties().forEach(politicalParty -> {
-                List<InspectionClient> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getTable()));
+                List<FiscalCallBack> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getDesk()));
                 clientsToNotify.forEach(inspectionClient -> {
                     try {
                         inspectionClient.notifyVote();

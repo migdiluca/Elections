@@ -1,14 +1,10 @@
 package Elections.client;
 
-import Elections.AdministrationService;
-import Elections.Exceptions.ElectionStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 public class Client {
     private static Logger logger = LoggerFactory.getLogger(Client.class);

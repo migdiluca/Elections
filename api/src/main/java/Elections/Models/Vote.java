@@ -5,23 +5,23 @@ import java.util.List;
 
 public class Vote implements Serializable {
 
-    private int table;
+    private int desk;
     // quizas podria haber otra alternativa mejor para guardar los votos en orden de preferencia
     private List<PoliticalParty> preferredParties;
     private Province province;
 
-    public Vote(int table, List<PoliticalParty> preferredParties, Province province) {
-        this.table = table;
+    public Vote(int desk, List<PoliticalParty> preferredParties, Province province) {
+        this.desk = desk;
         this.preferredParties = preferredParties;
         this.province = province;
     }
 
-    public int getTable() {
-        return table;
+    public int getDesk() {
+        return desk;
     }
 
-    public void setTable(int table) {
-        this.table = table;
+    public void setDesk(int desk) {
+        this.desk = desk;
     }
 
     public List<PoliticalParty> getPreferredParties() {
@@ -43,7 +43,7 @@ public class Vote implements Serializable {
     @Override
     public String toString() {
         return "Vote{" +
-                "table=" + table +
+                "desk=" + desk +
                 ", preferredParties=" + preferredParties +
                 ", province=" + province +
                 '}';

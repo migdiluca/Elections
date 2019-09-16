@@ -1,7 +1,7 @@
 package Elections.client;
 
 import Elections.Exceptions.ElectionStateException;
-import Elections.InspectionClient;
+import Elections.FiscalCallBack;
 import Elections.FiscalService;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
@@ -16,7 +16,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import static java.lang.System.exit;
 
-public class FiscalClient implements InspectionClient {
+public class FiscalClient implements FiscalCallBack {
 
     @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the fiscal service is located.", required = true)
     private String ip;
@@ -24,8 +24,8 @@ public class FiscalClient implements InspectionClient {
     @Option(name = "-Dparty", aliases = "--partyName", usage = "Name of political party to inspect", required = true)
     private PoliticalParty party;
 
-    @Option(name = "-Did", aliases = "--pollingPlaceNumber", usage = "Table number to inspect", required = true)
-    private Integer table;
+    @Option(name = "-Did", aliases = "--pollingPlaceNumber", usage = "Desk number to inspect", required = true)
+    private Integer desk;
 
     public String getIp() {
         return ip;
@@ -43,12 +43,12 @@ public class FiscalClient implements InspectionClient {
         this.party = party;
     }
 
-    public Integer getTable() {
-        return table;
+    public Integer getDesk() {
+        return desk;
     }
 
-    public void setTable(Integer table) {
-        this.table = table;
+    public void setDesk(Integer desk) {
+        this.desk = desk;
     }
 
     public static void main(String[] args) {
@@ -84,7 +84,7 @@ public class FiscalClient implements InspectionClient {
 
         // Registramos la funcion de callback del cliente
         try {
-            is.addInspector(client, client.getParty(), client.getTable());
+            is.addInspector(client, client.getParty(), client.getDesk());
         } catch (RemoteException e) {
             System.out.println("Could not reach service");
             return;
@@ -94,12 +94,12 @@ public class FiscalClient implements InspectionClient {
         }
 
         // Nos registramos correctamente
-        System.out.println("Fiscal of " + client.getParty().name() + " registered on polling place " + client.getTable());
+        System.out.println("Fiscal of " + client.getParty().name() + " registered on polling place " + client.getDesk());
     }
 
     @Override
     public void notifyVote() throws RemoteException {
-        System.out.println("New vote for " + party.name() + " on pooling place " + table.toString());
+        System.out.println("New vote for " + party.name() + " on pooling place " + desk.toString());
     }
 
     @Override

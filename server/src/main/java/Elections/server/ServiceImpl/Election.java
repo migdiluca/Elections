@@ -1,6 +1,6 @@
 package Elections.server.ServiceImpl;
 
-import Elections.InspectionClient;
+import Elections.FiscalCallBack;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -21,7 +21,7 @@ public class Election {
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
-    private Map<Pair<PoliticalParty, Integer>,List<InspectionClient>> FiscalClients;
+    private Map<Pair<PoliticalParty, Integer>,List<FiscalCallBack>> FiscalClients;
 
     private final Object mutexVotesA = "Vote list mutex";
     private final Object mutexVotesB = "Partial votes list mutex";
@@ -74,7 +74,7 @@ public class Election {
         return nationalFinalResults;
     }
 
-    public Map<Pair<PoliticalParty, Integer>, List<InspectionClient>> getFiscalClients() {
+    public Map<Pair<PoliticalParty, Integer>, List<FiscalCallBack>> getFiscalClients() {
         return FiscalClients;
     }
 

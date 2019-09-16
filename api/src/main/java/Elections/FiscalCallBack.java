@@ -5,8 +5,7 @@ import Elections.Models.ElectionState;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface InspectionClient extends Remote {
-
+public interface FiscalCallBack extends Remote {
 
     /**
      * Notifies vote to political party in its correct desk
