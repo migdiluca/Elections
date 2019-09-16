@@ -2,16 +2,14 @@ package CSVUtils;
 
 import Elections.Models.PoliticalParty;
 import com.opencsv.CSVWriter;
-import com.opencsv.bean.ColumnPositionMappingStrategy;
-import com.opencsv.bean.MappingStrategy;
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.bean.*;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import javafx.util.Pair;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -19,7 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVWrite {
+public class CSVUtil {
 
     public static void writeCsv(Path path, List<Pair<BigDecimal, PoliticalParty>> result) {
         try {
@@ -51,5 +49,20 @@ public class CSVWrite {
         } catch (IOException e) {
             e.getMessage();
         }
+    }
+
+    public static List CSVRead(Path path, Class bean) throws Exception {
+        ColumnPositionMappingStrategy ms = new ColumnPositionMappingStrategy();
+        ms.setType(bean);
+
+        Reader reader = Files.newBufferedReader(path);
+
+        CsvToBean cb = new CsvToBeanBuilder(reader)
+                .withMappingStrategy(ms)
+                .withSeparator(';')
+                .build();
+        List beanList = cb.parse();
+        reader.close();
+        return beanList;
     }
 }

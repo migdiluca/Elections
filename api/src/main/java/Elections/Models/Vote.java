@@ -1,14 +1,26 @@
 package Elections.Models;
 
+import Elections.OpenCSV.PoliticalPartyListConverter;
+import Elections.OpenCSV.ProvinceConverter;
+import com.opencsv.bean.CsvBindByPosition;
+import com.opencsv.bean.CsvCustomBindByPosition;
+
 import java.io.Serializable;
 import java.util.List;
 
 public class Vote implements Serializable {
 
-    private int table;
-    // quizas podria haber otra alternativa mejor para guardar los votos en orden de preferencia
-    private List<PoliticalParty> preferredParties;
+    @CsvBindByPosition(position = 0)
+    private Integer table;
+
+    @CsvCustomBindByPosition(converter = ProvinceConverter.class, position = 1)
     private Province province;
+
+    @CsvCustomBindByPosition(converter = PoliticalPartyListConverter.class, position = 2)
+    private List<PoliticalParty> preferredParties;
+
+    public Vote() {
+    }
 
     public Vote(int table, List<PoliticalParty> preferredParties, Province province) {
         this.table = table;
@@ -16,11 +28,11 @@ public class Vote implements Serializable {
         this.province = province;
     }
 
-    public int getTable() {
+    public Integer getTable() {
         return table;
     }
 
-    public void setTable(int table) {
+    public void setTable(Integer table) {
         this.table = table;
     }
 
@@ -44,8 +56,8 @@ public class Vote implements Serializable {
     public String toString() {
         return "Vote{" +
                 "table=" + table +
-                ", preferredParties=" + preferredParties +
-                ", province=" + province +
+                ", province='" + province + '\'' +
+                ", preferredParties='" + preferredParties + '\'' +
                 '}';
     }
 }

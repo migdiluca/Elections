@@ -1,6 +1,6 @@
 package Elections.client;
 
-import CSVUtils.CSVWrite;
+import CSVUtils.CSVUtil;
 import Elections.AdministrationService;
 import Elections.ConsultingService;
 import Elections.Exceptions.ElectionStateException;
@@ -108,6 +108,6 @@ public class QueryClient {
         }
 
         System.out.println(results);
-        CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
+        CSVUtil.writeCsv(Paths.get(client.getVotesFileName()), results);
     }
 }
