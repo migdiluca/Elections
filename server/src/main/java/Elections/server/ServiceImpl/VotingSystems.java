@@ -65,7 +65,7 @@ public class VotingSystems {
         List<Map.Entry<PoliticalParty, List<Vote>>> sortedEntries = masterMap.entrySet().stream()
                 .sorted((e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()))
                 .collect(Collectors.toList());
-        if ((sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
+        if (sortedEntries.isEmpty() || (sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
             // hay un ganador
             return sortedEntries.stream().map((e) -> new Pair<BigDecimal, PoliticalParty>(
                     new BigDecimal((e.getValue().size() / (double) total)*100).setScale(2, BigDecimal.ROUND_DOWN),

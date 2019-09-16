@@ -25,7 +25,6 @@ public class AdministrationServiceImplTest {
 
     private static ExecutorService service;
 
-
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -49,7 +48,6 @@ public class AdministrationServiceImplTest {
     public final void after() {
         service.shutdownNow();
     }
-
 
     @Test
     public void openElectionsTest() {
