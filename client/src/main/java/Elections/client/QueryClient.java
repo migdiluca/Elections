@@ -70,7 +70,7 @@ public class QueryClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            e.getMessage();
+            System.out.println(e.getMessage());
             System.exit(1);
         }
 

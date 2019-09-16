@@ -45,7 +45,7 @@ public class ManagementClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            e.getMessage();
+            System.out.println(e.getMessage());
             System.exit(1);
         }
 
@@ -83,7 +83,7 @@ public class ManagementClient {
         } catch (RemoteException ex) {
             System.out.println("Could not reach service");
         } catch (ElectionStateException | ServiceException ex) {
-            ex.getMessage();
+            System.out.println(ex.getMessage());
         }
     }
 }
