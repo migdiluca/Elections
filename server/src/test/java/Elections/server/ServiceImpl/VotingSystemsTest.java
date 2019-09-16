@@ -78,10 +78,10 @@ public class VotingSystemsTest {
         /*
          * Estos resultados fueron calculados a mano
          */
-        table1.add(new Pair<>(new BigDecimal(0.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table1.add(new Pair<>(new BigDecimal(0.66).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
-        table2.add(new Pair<>(new BigDecimal(0.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), OWL));table2.add(new Pair<>(new BigDecimal(0.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table2.add(new Pair<>(new BigDecimal(0.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
-        table3.add(new Pair<>(new BigDecimal(1.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
-        table4.add(new Pair<>(new BigDecimal(0.50).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table4.add(new Pair<>(new BigDecimal(0.50).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
+        table1.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table1.add(new Pair<>(new BigDecimal(66.66).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
+        table2.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), OWL));table2.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table2.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
+        table3.add(new Pair<>(new BigDecimal(100.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
+        table4.add(new Pair<>(new BigDecimal(50.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table4.add(new Pair<>(new BigDecimal(50.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
         Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> expectedResults = new HashMap<>();
         expectedResults.put(1, table1);
         expectedResults.put(2, table2);
