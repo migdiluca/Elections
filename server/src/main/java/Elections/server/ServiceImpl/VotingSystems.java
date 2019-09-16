@@ -6,10 +6,7 @@ import Elections.Models.Vote;
 import javafx.util.Pair;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,9 +101,9 @@ public class VotingSystems {
             Map<PoliticalParty, List<Vote>> collect = v.stream().collect(Collectors.groupingBy((u) -> u.getPreferredParties().get(0)));
             List<Pair<BigDecimal, PoliticalParty>> list = new ArrayList<>();
             collect.forEach((x, y) -> {
-                list.add(new Pair<>(new BigDecimal(y.size() / (double) v.size()).setScale(2, BigDecimal.ROUND_DOWN), x));
+                list.add(new Pair<>(new BigDecimal(100 * y.size() / (double) v.size()).setScale(2, BigDecimal.ROUND_DOWN), x));
             });
-            list.sort((a, b) -> a.getKey().subtract(b.getKey()).intValue());
+            list.sort(Comparator.comparing(Pair::getKey));
             map.put(k, list);
         });
         return map;
