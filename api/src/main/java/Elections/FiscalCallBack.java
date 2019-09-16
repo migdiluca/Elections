@@ -12,7 +12,13 @@ public interface FiscalCallBack extends Remote {
      */
     void notifyVote() throws RemoteException;
 
+    /**
+     * Notifies that elections have ended, in consequence client stops execution
+     */
     void endClient() throws RemoteException;
 
+    /**
+     * Notifies an error
+     */
     void submitError(ElectionState electionState) throws RemoteException;
 }
