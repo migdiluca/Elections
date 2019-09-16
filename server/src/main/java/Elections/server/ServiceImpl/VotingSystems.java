@@ -14,6 +14,10 @@ import java.util.stream.Stream;
 public class VotingSystems {
 
     private List<Vote> votes;
+    private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByPercentage = (a1, a2) -> a2.getKey().compareTo(a1.getKey());
+    private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByName = Comparator.comparing(p -> p.getValue().name());
+    public final static Comparator<Pair<BigDecimal, PoliticalParty>> cmp = cmpByPercentage.thenComparing(cmpByName);
+    // o poner en la clase Election
 
     public VotingSystems(List<Vote> votes) {
         this.votes = votes;
@@ -35,7 +39,13 @@ public class VotingSystems {
         if (i != parties.size()) {
             // hay un candidato que sigue compitiendo => se le transfiere un voto
             PoliticalParty party = parties.get(i);
-            masterMap.get(party).add(vote);
+            if (masterMap.containsKey(party)) {
+                masterMap.get(party).add(vote);
+            } else {
+                List<Vote> votes = new ArrayList<>();
+                votes.add(vote);
+                masterMap.put(party, votes);
+            }
             return true;
         }
         return false;
@@ -90,7 +100,9 @@ public class VotingSystems {
     public List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
         Map<PoliticalParty, List<Vote>> masterMap = votes.stream()
                 .collect(Collectors.groupingBy(vote -> vote.getPreferredParties().get(0)));
-        return alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
+        List<Pair<BigDecimal, PoliticalParty>> result = alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
+        result.sort(cmp);
+        return result;
     }
 
     public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> calculateDeskResults() {
@@ -103,7 +115,7 @@ public class VotingSystems {
             collect.forEach((x, y) -> {
                 list.add(new Pair<>(new BigDecimal(100 * y.size() / (double) v.size()).setScale(2, BigDecimal.ROUND_DOWN), x));
             });
-            list.sort((a, b) -> b.getKey().compareTo(a.getKey()));
+            list.sort(cmp);
             map.put(k, list);
         });
         return map;
