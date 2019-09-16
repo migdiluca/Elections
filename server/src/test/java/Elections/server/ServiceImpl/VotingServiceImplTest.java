@@ -33,7 +33,7 @@ public class VotingServiceImplTest {
 
 
     @Before
-    public void init(){
+    public void init() {
         try {
 
             electionRunning = new Election();
@@ -84,19 +84,19 @@ public class VotingServiceImplTest {
     }
 
     @Test
-    public void voteTest() throws RemoteException{
-        try{
-            votingServiceNotStarted.vote(votes);
-            fail();
-        }catch (ElectionStateException ignore) {}
+    public void voteTest() {
+        service.execute(() -> {
+            try {
+                votingServiceNotStarted.vote(votes);
+                fail();
+            } catch (ElectionStateException | RemoteException ignore) {}
+            try {
+                votingServiceRunning.vote(votes);
+            } catch (ElectionStateException | RemoteException e) {
+                fail();
+            }
 
-        try{
-            votingServiceRunning.vote(votes);
-        } catch (ElectionStateException e) {
-            fail();
-        }
-
-        assertEquals(votes,electionRunning.getVotingList());
-
+            assertEquals(votes, electionRunning.getVotingList());
+        });
     }
 }
