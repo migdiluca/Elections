@@ -6,7 +6,9 @@ import java.util.List;
 public class Vote implements Serializable {
 
     private int desk;
-    // quizas podria haber otra alternativa mejor para guardar los votos en orden de preferencia
+    /*
+        Political parties are ordered by preference in descending order
+     */
     private List<PoliticalParty> preferredParties;
     private Province province;
 
