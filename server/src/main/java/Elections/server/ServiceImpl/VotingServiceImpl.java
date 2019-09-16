@@ -45,7 +45,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         try {
             future.get();
         } catch (InterruptedException | ExecutionException  e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 

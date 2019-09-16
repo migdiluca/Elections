@@ -36,7 +36,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 
@@ -62,7 +62,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
 
     }
@@ -88,7 +88,7 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 }

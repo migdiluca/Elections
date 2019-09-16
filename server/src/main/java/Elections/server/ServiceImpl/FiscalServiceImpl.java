@@ -47,7 +47,7 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
 
     }
