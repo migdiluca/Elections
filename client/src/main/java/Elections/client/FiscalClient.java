@@ -56,8 +56,7 @@ public class FiscalClient implements InspectionClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            // todo: no imprimir un stack asi nomas
-            e.printStackTrace();
+            System.out.println("There was a problem reading the arguments");
             exit(1);
         }
 

@@ -34,10 +34,6 @@ public class Server {
         registry.rebind(FiscalService.SERVICE_NAME, is);
         registry.rebind(ConsultingService.SERVICE_NAME, cs);
 
-        System.out.println("Server up and running: " + registry);
-        System.out.println(as);
-        System.out.println(vs);
-        System.out.println(is);
-        System.out.println(cs);
+        System.out.println("Server up and running on port:" + port);
     }
 }

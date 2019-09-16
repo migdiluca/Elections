@@ -70,7 +70,7 @@ public class QueryClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("There was a problem reading the arguments");
             System.exit(1);
         }
 
@@ -84,11 +84,9 @@ public class QueryClient {
             cs = (ConsultingService) registry.lookup(ConsultingService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
-            System.out.println(e.getMessage());
             return;
         } catch (NotBoundException e) {
             System.out.println("There where problems finding the service needed service ");
-            System.out.println(e.getMessage());
             return;
         }
 
@@ -103,10 +101,8 @@ public class QueryClient {
             }
         } catch (RemoteException e) {
             System.out.println("There was an error retriving results from" + ConsultingService.SERVICE_NAME);
-            System.out.println(e.getMessage());
             return;
         } catch (ElectionStateException e) {
-            System.out.println("Elections are not open");
             System.out.println(e.getMessage());
             return;
         }

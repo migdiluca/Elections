@@ -43,7 +43,7 @@ public class VoteClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("There was a problem reading the arguments");
             System.exit(1);
         }
         // si llegamos aca esta recibimos los argumentos de manera correcta

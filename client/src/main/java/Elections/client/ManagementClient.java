@@ -45,7 +45,7 @@ public class ManagementClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("There was a problem reading the arguments");
             System.exit(1);
         }
 
