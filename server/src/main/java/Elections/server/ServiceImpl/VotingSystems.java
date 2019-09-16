@@ -71,7 +71,7 @@ public class VotingSystems {
         if ((sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
             // hay un ganador
             return sortedEntries.stream().map((e) -> new Pair<BigDecimal, PoliticalParty>(
-                    new BigDecimal(e.getValue().size() / (double) total).setScale(2, BigDecimal.ROUND_DOWN),
+                    new BigDecimal((e.getValue().size() / (double) total)*100).setScale(2, BigDecimal.ROUND_DOWN),
                     e.getKey())).collect(Collectors.toList());
         }
         Map.Entry<PoliticalParty, List<Vote>> loser = sortedEntries.get(sortedEntries.size() - 1);
