@@ -103,7 +103,7 @@ public class VotingSystems {
             collect.forEach((x, y) -> {
                 list.add(new Pair<>(new BigDecimal(100 * y.size() / (double) v.size()).setScale(2, BigDecimal.ROUND_DOWN), x));
             });
-            list.sort(Comparator.comparing(Pair::getKey));
+            list.sort((a, b) -> b.getKey().compareTo(a.getKey()));
             map.put(k, list);
         });
         return map;

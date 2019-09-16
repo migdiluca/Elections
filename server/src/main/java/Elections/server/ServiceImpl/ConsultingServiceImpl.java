@@ -81,7 +81,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
                         retList.add(new Pair<>(new BigDecimal(
                                 100 * electionState.getPartialVotes()[i] / (double) electionState.getAmountOfVotes()).setScale(2, BigDecimal.ROUND_DOWN), p));
                     }
-                    retList.sort(Comparator.comparing(Pair::getKey));
+                    retList.sort((a, b) -> b.getKey().compareTo(a.getKey()));
                     return retList;
                 } else {
                     return null;
