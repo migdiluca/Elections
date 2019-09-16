@@ -81,9 +81,11 @@ public class VotingSystemsTest {
         List<Pair<BigDecimal, PoliticalParty>> table2 = new LinkedList<>();
         List<Pair<BigDecimal, PoliticalParty>> table3 = new LinkedList<>();
         List<Pair<BigDecimal, PoliticalParty>> table4 = new LinkedList<>();
+
         /*
          * Estos resultados fueron calculados a mano
          */
+
         table1.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table1.add(new Pair<>(new BigDecimal(66.66).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
         table2.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), OWL));table2.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));table2.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
         table3.add(new Pair<>(new BigDecimal(100.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
