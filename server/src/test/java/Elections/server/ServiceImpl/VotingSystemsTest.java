@@ -57,14 +57,20 @@ public class VotingSystemsTest {
     @Test
     public void alternativeVoteNationalLevel() throws Exception {
         List<Pair<BigDecimal, PoliticalParty>> result = votingSystems.alternativeVoteNationalLevel();
+        System.out.println(result);
 
         /*
          * Los resultados esperados para este sistema fueron obtenidos con el siguiente motor: http://condorcet.ericgorr.net
          */
-            //todo
-//        assertEquals(result.getValue(), BUFFALO);
-//        // ni idea por que lo agarra como un 0.58999999 al hacer round down se me va a 0.58
-//        assertEquals(result.getKey(), new BigDecimal(0.59).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+        assertEquals(result.get(0).getValue(), BUFFALO);
+        assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+        assertEquals(result.get(1).getValue(), MONKEY);
+        assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+        assertEquals(result.get(2).getValue(), OWL);
+        assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
     }
 
     @Test
