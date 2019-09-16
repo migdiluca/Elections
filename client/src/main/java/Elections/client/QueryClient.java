@@ -104,12 +104,14 @@ public class QueryClient {
         } catch (RemoteException e) {
             System.out.println("There was an error retriving results from" + ConsultingService.SERVICE_NAME);
             System.out.println(e.getMessage());
+            return;
         } catch (ElectionStateException e) {
             System.out.println("Elections are not open");
             System.out.println(e.getMessage());
+            return;
         }
+
         System.out.println(results);
         CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
-
     }
 }

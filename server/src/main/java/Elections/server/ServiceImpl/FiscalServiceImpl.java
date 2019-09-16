@@ -31,7 +31,7 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
             try {
                 inspectionClient.submitError(electionState.getElectionState());
             } catch (RemoteException e) {
-                System.out.println("Cannot reach client");
+                System.out.println("Cannot add insector when elections are already started or ended");
             }
             return;
         }

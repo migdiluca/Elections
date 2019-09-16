@@ -78,12 +78,13 @@ public class ManagementClient {
                     ElectionState state = as.getElectionState();
                     System.out.println(state.getDesc());
                     break;
-
             }
         } catch (RemoteException ex) {
             System.out.println("Could not reach service");
+            return;
         } catch (ElectionStateException | ServiceException ex) {
             System.out.println(ex.getMessage());
+            return;
         }
     }
 }
