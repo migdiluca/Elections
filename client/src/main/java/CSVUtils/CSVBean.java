@@ -12,7 +12,7 @@ import java.util.List;
 public class CSVBean {
 
     @CsvBindByPosition(position = 0)
-    private Integer table;
+    private Integer desk;
 
 //    @CsvBindByPosition(position = 1)
 //    private String province;
@@ -26,12 +26,12 @@ public class CSVBean {
     @CsvCustomBindByPosition(converter = PoliticalPartyListConverter.class, position = 2)
     private List<PoliticalParty> politicalParties;
 
-    public Integer getTable() {
-        return table;
+    public Integer getDesk() {
+        return desk;
     }
 
-    public void setTable(Integer table) {
-        this.table = table;
+    public void setDesk(Integer desk) {
+        this.desk = desk;
     }
 
 //    public String getProvince() {
@@ -81,7 +81,7 @@ public class CSVBean {
     @Override
     public String toString() {
         return "CSVBean{" +
-                "table=" + table +
+                "desk=" + desk +
                 ", province='" + province + '\'' +
                 ", politicalPartys='" + politicalParties + '\'' +
                 '}';

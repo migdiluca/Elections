@@ -1,7 +1,7 @@
 package Elections.server;
 
-import Elections.AdministrationService;
-import Elections.ConsultingService;
+import Elections.ManagementService;
+import Elections.QueryService;
 import Elections.FiscalService;
 import Elections.VotingService;
 import Elections.server.ServiceImpl.*;
@@ -22,17 +22,17 @@ public class Server {
 
         Election electionState = new Election();
 
-        AdministrationService as = new AdministrationServiceImpl(electionState);
+        ManagementService as = new ManagementServiceImpl(electionState);
         VotingService vs = new VotingServiceImpl(electionState);
         FiscalService is = new FiscalServiceImpl(electionState);
-        ConsultingService cs = new ConsultingServiceImpl(electionState);
+        QueryService cs = new QueryServiceImpl(electionState);
 
         final Registry registry = LocateRegistry.createRegistry(port);
 
-        registry.rebind(AdministrationService.SERVICE_NAME, as);
+        registry.rebind(ManagementService.SERVICE_NAME, as);
         registry.rebind(VotingService.SERVICE_NAME, vs);
         registry.rebind(FiscalService.SERVICE_NAME, is);
-        registry.rebind(ConsultingService.SERVICE_NAME, cs);
+        registry.rebind(QueryService.SERVICE_NAME, cs);
 
         System.out.println("Server up and running on port:" + port);
     }

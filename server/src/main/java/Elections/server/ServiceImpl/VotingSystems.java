@@ -77,7 +77,7 @@ public class VotingSystems {
                 .collect(Collectors.toList());
         if (sortedEntries.isEmpty() || (sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
             // hay un ganador
-            return sortedEntries.stream().map((e) -> new Pair<BigDecimal, PoliticalParty>(
+            return sortedEntries.stream().map((e) -> new Pair<>(
                     new BigDecimal((e.getValue().size() / (double) total)*100).setScale(2, BigDecimal.ROUND_DOWN),
                     e.getKey())).collect(Collectors.toList());
         }
@@ -108,7 +108,7 @@ public class VotingSystems {
     public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> calculateDeskResults() {
         Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
         Map<Integer, List<Vote>> votesPerDesk = votes.stream()
-                .collect(Collectors.groupingBy(Vote::getTable));
+                .collect(Collectors.groupingBy(Vote::getDesk));
         votesPerDesk.forEach((k, v) -> {
             Map<PoliticalParty, List<Vote>> collect = v.stream().collect(Collectors.groupingBy((u) -> u.getPreferredParties().get(0)));
             List<Pair<BigDecimal, PoliticalParty>> list = new ArrayList<>();

@@ -9,7 +9,7 @@ import Elections.Models.ElectionState;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface AdministrationService extends Remote {
+public interface ManagementService extends Remote {
 
     String SERVICE_NAME = "administration_service";
 

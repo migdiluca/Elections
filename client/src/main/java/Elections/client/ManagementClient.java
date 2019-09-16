@@ -1,11 +1,9 @@
 package Elections.client;
 
-import Elections.AdministrationService;
-import Elections.Exceptions.AlreadyFinishedElectionException;
+import Elections.ManagementService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
-import Elections.VotingService;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
@@ -51,10 +49,10 @@ public class ManagementClient {
 
         // iniciamos la conección con el servidor
         String[] serverAddr = client.getIp().split(":", -1);
-        final AdministrationService as;
+        final ManagementService as;
         try {
             final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
-            as = (AdministrationService) registry.lookup(AdministrationService.SERVICE_NAME);
+            as = (ManagementService) registry.lookup(ManagementService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
             System.out.println(e.getMessage());

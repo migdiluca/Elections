@@ -1,9 +1,8 @@
 package Elections.server.ServiceImpl;
 
-import Elections.ConsultingService;
+import Elections.QueryService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
-import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -18,12 +17,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ConsultingServiceImpl extends UnicastRemoteObject implements ConsultingService {
+public class QueryServiceImpl extends UnicastRemoteObject implements QueryService {
 
     private Election electionState;
     private ExecutorService exService;
 
-    public ConsultingServiceImpl(Election electionState) throws RemoteException {
+    public QueryServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
         exService = Executors.newFixedThreadPool(12);
     }
@@ -37,7 +36,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 
@@ -50,7 +49,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 
@@ -63,7 +62,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
 
     }
@@ -89,7 +88,7 @@ public class ConsultingServiceImpl extends UnicastRemoteObject implements Consul
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getMessage());
+            throw new ElectionStateException(e.getCause().getMessage());
         }
     }
 }

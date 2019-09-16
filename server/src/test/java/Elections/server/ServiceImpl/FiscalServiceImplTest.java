@@ -2,7 +2,7 @@ package Elections.server.ServiceImpl;
 
 
 import Elections.Exceptions.ElectionStateException;
-import Elections.InspectionClient;
+import Elections.FiscalCallBack;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import javafx.util.Pair;
@@ -46,7 +46,7 @@ public class FiscalServiceImplTest {
     public void addInspectorSingleTest() throws RemoteException, ElectionStateException {
 
         service.execute(() -> {
-            InspectionClient inspectionClient = new InspectionClient() {
+            FiscalCallBack fiscalCallBack = new FiscalCallBack() {
                 @Override
                 public void notifyVote() throws RemoteException {
 
@@ -63,7 +63,7 @@ public class FiscalServiceImplTest {
                 }
             };
             try {
-                fiscalService.addInspector(inspectionClient, PoliticalParty.BUFFALO, 1);
+                fiscalService.addInspector(fiscalCallBack, PoliticalParty.BUFFALO, 1);
             } catch (RemoteException | ElectionStateException e) {
                 e.printStackTrace();
             }
@@ -72,7 +72,7 @@ public class FiscalServiceImplTest {
             Pair<PoliticalParty, Integer> pair2 = new Pair<>(PoliticalParty.BUFFALO, 2);
 
             if (election.getFiscalClients().containsKey(pair1)) {
-                assertEquals(inspectionClient, election.getFiscalClients().get(pair1).get(0));
+                assertEquals(fiscalCallBack, election.getFiscalClients().get(pair1).get(0));
             }
             if (election.getFiscalClients().containsKey(pair2)) {
                 fail();
@@ -84,7 +84,7 @@ public class FiscalServiceImplTest {
     public void addInspectorMultipleTest() throws RemoteException, ElectionStateException {
 
         service.execute(() -> {
-            InspectionClient inspectionClient = new InspectionClient() {
+            FiscalCallBack fiscalCallBack = new FiscalCallBack() {
                 @Override
                 public void notifyVote() throws RemoteException {
 
@@ -101,7 +101,7 @@ public class FiscalServiceImplTest {
                 }
             };
             try {
-                fiscalService.addInspector(inspectionClient, PoliticalParty.BUFFALO, 1);
+                fiscalService.addInspector(fiscalCallBack, PoliticalParty.BUFFALO, 1);
             } catch (RemoteException | ElectionStateException e) {
                 e.printStackTrace();
             }
@@ -110,7 +110,7 @@ public class FiscalServiceImplTest {
                 for (int i = 0; i < 20; i++) {
                     Pair<PoliticalParty, Integer> pair = new Pair<>(pp, i);
                     if (election.getFiscalClients().containsKey(pair)) {
-                        assertEquals(inspectionClient, election.getFiscalClients().get(pair).get(0));
+                        assertEquals(fiscalCallBack, election.getFiscalClients().get(pair).get(0));
                     }
                 }
             }

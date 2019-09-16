@@ -1,6 +1,6 @@
 package Elections.server.ServiceImpl;
 
-import Elections.AdministrationService;
+import Elections.ManagementService;
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
@@ -23,13 +23,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class AdministrationServiceImpl extends UnicastRemoteObject implements AdministrationService {
+public class ManagementServiceImpl extends UnicastRemoteObject implements ManagementService {
 
     private Election election;
     private ExecutorService exService;
     private VotingSystems votingSystems;
 
-    public AdministrationServiceImpl(int port) throws RemoteException {
+    public ManagementServiceImpl(int port) throws RemoteException {
         super(port);
         exService = Executors.newFixedThreadPool(12);
     }
@@ -38,7 +38,7 @@ public class AdministrationServiceImpl extends UnicastRemoteObject implements Ad
         return election;
     }
 
-    public AdministrationServiceImpl(Election electionState) throws RemoteException {
+    public ManagementServiceImpl(Election electionState) throws RemoteException {
         this.election = electionState;
         exService = Executors.newFixedThreadPool(12);
     }

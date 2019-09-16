@@ -3,20 +3,16 @@ package Elections;
 
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
-import Elections.Exceptions.ServiceException;
-import Elections.Models.Dimension;
 import Elections.Models.PoliticalParty;
 import javafx.util.Pair;
 import Elections.Models.Province;
-import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
 
-public interface ConsultingService extends Remote {
+public interface QueryService extends Remote {
 
     String SERVICE_NAME = "consulting_service";
 

@@ -11,29 +11,32 @@ import java.util.List;
 public class Vote implements Serializable {
 
     @CsvBindByPosition(position = 0)
-    private Integer table;
+    private Integer desk;
 
     @CsvCustomBindByPosition(converter = ProvinceConverter.class, position = 1)
     private Province province;
 
+    /*
+        Political parties are ordered by preference in descending order
+     */
     @CsvCustomBindByPosition(converter = PoliticalPartyListConverter.class, position = 2)
     private List<PoliticalParty> preferredParties;
 
     public Vote() {
     }
 
-    public Vote(int table, List<PoliticalParty> preferredParties, Province province) {
-        this.table = table;
+    public Vote(Integer desk, List<PoliticalParty> preferredParties, Province province) {
+        this.desk = desk;
         this.preferredParties = preferredParties;
         this.province = province;
     }
 
-    public Integer getTable() {
-        return table;
+    public Integer getDesk() {
+        return desk;
     }
 
-    public void setTable(Integer table) {
-        this.table = table;
+    public void setDesk(Integer desk) {
+        this.desk = desk;
     }
 
     public List<PoliticalParty> getPreferredParties() {
@@ -55,7 +58,7 @@ public class Vote implements Serializable {
     @Override
     public String toString() {
         return "Vote{" +
-                "table=" + table +
+                "desk=" + desk +
                 ", province='" + province + '\'' +
                 ", preferredParties='" + preferredParties + '\'' +
                 '}';

@@ -13,11 +13,11 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
-public class AdministrationServiceImplTest {
+public class ManagementServiceImplTest {
 
-    private AdministrationServiceImpl administrationService;
-    private AdministrationServiceImpl administrationServiceRunning;
-    private AdministrationServiceImpl administrationServiceFinished;
+    private ManagementServiceImpl administrationService;
+    private ManagementServiceImpl administrationServiceRunning;
+    private ManagementServiceImpl administrationServiceFinished;
 
     private static ExecutorService service;
 
@@ -25,13 +25,13 @@ public class AdministrationServiceImplTest {
     public void init() {
         try {
             Election election = new Election();
-            administrationService = new AdministrationServiceImpl(election);
+            administrationService = new ManagementServiceImpl(election);
             Election election1 = new Election();
             election1.setElectionState(ElectionState.FINISHED);
-            administrationServiceFinished = new AdministrationServiceImpl(election1);
+            administrationServiceFinished = new ManagementServiceImpl(election1);
             Election election2 = new Election();
             election2.setElectionState(ElectionState.RUNNING);
-            administrationServiceRunning = new AdministrationServiceImpl(election2);
+            administrationServiceRunning = new ManagementServiceImpl(election2);
 
             service = Executors.newFixedThreadPool(2);
         } catch (RemoteException e) {
