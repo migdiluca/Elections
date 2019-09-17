@@ -149,6 +149,7 @@ public class VotingSystems {
         // We return the winners with with the FRACTION of votes they won over the total amount of votes
         return winnersSet.stream()
                 .map((Pair<PoliticalParty, VoteList> p) -> new Pair<>(p.getKey(), p.getValue().votes/provinceCount))
+                .sorted(Comparator.comparingDouble(Pair::getValue))
                 .collect(Collectors.toList());
     }
 
