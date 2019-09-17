@@ -16,6 +16,12 @@ public class Vote implements Serializable {
         this.province = province;
     }
 
+    public Vote(Vote v) {
+        this.table = v.getTable();
+        this.preferredParties = v.getPreferredParties();
+        this.province = v.getProvince();
+    }
+
     public int getTable() {
         return table;
     }
