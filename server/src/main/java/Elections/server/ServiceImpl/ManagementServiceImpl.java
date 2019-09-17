@@ -1,10 +1,7 @@
 package Elections.server.ServiceImpl;
 
+import Elections.Exceptions.*;
 import Elections.ManagementService;
-import Elections.Exceptions.AlreadyFinishedElectionException;
-import Elections.Exceptions.ElectionStateException;
-import Elections.Exceptions.ElectionsNotStartedException;
-import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -47,8 +44,10 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     @Override
     public synchronized void openElections() throws ElectionStateException, RemoteException {
-        if (election.getElectionState().equals(ElectionState.FINISHED))
+        if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING))
             throw new AlreadyFinishedElectionException();
+        if(election.getElectionState().equals(ElectionState.RUNNING))
+            throw new ElectionsAlreadyStartedException();
         election.setElectionState(ElectionState.RUNNING);
     }
 
@@ -69,7 +68,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
         synchronized (mutex) {
             if (election.getElectionState().equals(ElectionState.NOT_STARTED))
                 throw new ElectionsNotStartedException();
-            if (election.getElectionState().equals(ElectionState.FINISHED)) {
+            if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING)) {
                 throw new AlreadyFinishedElectionException();
             }
             election.setElectionState(ElectionState.CALCULATING);
