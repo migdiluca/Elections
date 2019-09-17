@@ -4,6 +4,7 @@ import Elections.ManagementService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
@@ -16,18 +17,21 @@ public class ManagementClient {
 
     enum Action {OPEN, STATE, CLOSE}
 
-    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where administration service is located.", required = true)
     private String ip;
 
     @Option(name = "-Daction", aliases = "--action", usage = "Action to performe", required = true)
     private Action action;
 
-    public String getIp() {
-        return ip;
+    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where administration service is located.", required = true)
+    public void setIp(String ip) throws CmdLineException {
+        if (!ip.matches("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})")) {
+            throw new CmdLineException("Invalid ip and port address");
+        }
+        this.ip = ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIp() {
+        return ip;
     }
 
     public Action getAction() {

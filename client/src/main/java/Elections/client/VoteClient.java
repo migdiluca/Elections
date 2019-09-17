@@ -4,6 +4,7 @@ import CSVUtils.Data;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Vote;
 import Elections.VotingService;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.util.*;
 
 public class VoteClient {
 
-    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where voting service is located.", required = true)
     private String ip;
 
     @Option(name = "-DvotesPath", aliases = "--file", usage = "Fully qualified path and name of votes file.", required = true)
@@ -30,12 +30,16 @@ public class VoteClient {
         this.votesFileName = votesFileName;
     }
 
-    public String getIp() {
-        return ip;
+    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where voting service is located.", required = true)
+    public void setIp(String ip) throws CmdLineException {
+        if (!ip.matches("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})")) {
+            throw new CmdLineException("Invalid ip and port address");
+        }
+        this.ip = ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIp() {
+        return ip;
     }
 
     public static void main(String[] args) {
