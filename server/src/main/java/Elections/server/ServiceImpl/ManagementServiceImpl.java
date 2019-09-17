@@ -1,10 +1,7 @@
 package Elections.server.ServiceImpl;
 
+import Elections.Exceptions.*;
 import Elections.ManagementService;
-import Elections.Exceptions.AlreadyFinishedElectionException;
-import Elections.Exceptions.ElectionStateException;
-import Elections.Exceptions.ElectionsNotStartedException;
-import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -27,7 +24,6 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     private Election election;
     private ExecutorService exService;
-    private VotingSystems votingSystems;
 
     private final Object mutex = "calculating results";
 
@@ -47,8 +43,10 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     @Override
     public synchronized void openElections() throws ElectionStateException, RemoteException {
-        if (election.getElectionState().equals(ElectionState.FINISHED))
+        if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING))
             throw new AlreadyFinishedElectionException();
+        if(election.getElectionState().equals(ElectionState.RUNNING))
+            throw new ElectionsAlreadyStartedException();
         election.setElectionState(ElectionState.RUNNING);
     }
 
@@ -69,18 +67,18 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
         synchronized (mutex) {
             if (election.getElectionState().equals(ElectionState.NOT_STARTED))
                 throw new ElectionsNotStartedException();
-            if (election.getElectionState().equals(ElectionState.FINISHED)) {
+            if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING)) {
                 throw new AlreadyFinishedElectionException();
             }
             election.setElectionState(ElectionState.CALCULATING);
         }
-        this.votingSystems = new VotingSystems(election.getVotingList());
+        VotingSystems votingSystems = new VotingSystems(election.getVotingList());
         election.setDeskFinalResults(votingSystems.calculateDeskResults());
         election.setNationalFinalResults(votingSystems.alternativeVoteNationalLevel());
 
         Map<Province, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
         for (Province p : Province.values()) {
-            map.put(p,votingSystems.stVoteProvicialLevel(p));
+            map.put(p, votingSystems.stVoteProvicialLevel(p));
         }
         election.setProvinceFinalResults(map);
 
@@ -90,14 +88,12 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
     }
 
     private void notifyEndToClients() {
-        election.getFiscalClients().forEach((pair, clientList) -> {
-            clientList.forEach(client -> {
-                try {
-                    client.endClient();
-                } catch (RemoteException e) {
-                    System.out.println("Remote exception while ending client");
-                }
-            });
-        });
+        election.getFiscalClients().forEach((pair, clientList) -> clientList.forEach(client -> {
+            try {
+                client.endClient();
+            } catch (RemoteException e) {
+                System.out.println("Remote exception while ending client");
+            }
+        }));
     }
 }
