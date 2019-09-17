@@ -1,13 +1,9 @@
 package Elections.client;
 
 import CSVUtils.CSVUtil;
-import CSVUtils.Data;
-import CSVUtils.ResultBean;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Vote;
 import Elections.VotingService;
-import Elections.server.ServiceImpl.VotingSystems;
-import javafx.util.Pair;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
@@ -18,7 +14,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class VoteClient {
 
@@ -57,43 +52,36 @@ public class VoteClient {
         }
         // if it gets here, than it is receiving the args correctly
         // getting the csv info
-        Data data = new Data(Paths.get(client.getVotesFileName()));
-        List<Vote> votes = new ArrayList<>(data.get());
-        VotingSystems vs = new VotingSystems(votes);
-//        try {
-//            CSVUtil.writeCsvBean(Paths.get("/Users/fermingomez/Desktop/results.csv"), vs.alternativeVoteNationalLevel(), ResultBean.class);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        String[] headerColumnNames = {"Porcentaje", "Partido"};
-        CSVUtil.writeCsvBean(Paths.get("/Users/fermingomez/Desktop/results.csv"),
-                vs.alternativeVoteNationalLevel().stream().map(pair -> new ResultBean(pair.getKey(), pair.getValue())).collect(Collectors.toList()),
-                ResultBean.class,
-                headerColumnNames);
+        List<Vote> votes = null;
+        try {
+            votes = CSVUtil.CSVRead(Paths.get(client.getVotesFileName()), Vote.class);
+        } catch (Exception e) {
+            System.err.println("An error has been encountered while reading votes file");
+            System.err.println("Exiting...");
+            System.exit(1);
+        }
 
-//
-//        // starting server connection
-//        String[] serverAddr = client.getIp().split(":", -1);
-//        final VotingService vs;
-//        try {
-//            final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
-//            vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
-//        } catch (RemoteException e) {
-//            System.err.println("There where problems finding the registry at ip: " + client.getIp());
-//            System.err.println(e.getMessage());
-//            return;
-//        } catch (NotBoundException e) {
-//            System.err.println("There where problems finding the service needed service ");
-//            System.err.println(e.getMessage());
-//            return;
-//        }
-//
-//        // if it gets here than the election is open(for at least some seconds prior)
-//        // sending the votes
-//        if (client.uploadVotes(vs, votes)) {
-//            System.out.println(votes.size() + " votes registered");
-//        }
+        // starting server connection
+        String[] serverAddr = client.getIp().split(":", -1);
+        final VotingService vs;
+        try {
+            final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
+            vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
+        } catch (RemoteException e) {
+            System.err.println("There where problems finding the registry at ip: " + client.getIp());
+            System.err.println(e.getMessage());
+            return;
+        } catch (NotBoundException e) {
+            System.err.println("There where problems finding the service needed service ");
+            System.err.println(e.getMessage());
+            return;
+        }
 
+        // if it gets here than the election is open(for at least some seconds prior)
+        // sending the votes
+        if (client.uploadVotes(vs, votes)) {
+            System.out.println(votes.size() + " votes registered");
+        }
     }
 
     private boolean uploadVotes(VotingService vs, List<Vote> votes) {
@@ -112,7 +100,6 @@ public class VoteClient {
             System.err.println(e.getMessage());
             return false;
         }
-
         return true;
     }
 }
