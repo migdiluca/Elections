@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +29,6 @@ public class VotingServiceImplTest {
     private VotingServiceImpl votingServiceNotStarted;
     private static ExecutorService service;
     private Election electionRunning;
-    private Election electionNotStarted;
     private List<Vote> votes;
 
 
@@ -38,14 +38,14 @@ public class VotingServiceImplTest {
 
             electionRunning = new Election();
             electionRunning.setElectionState(ElectionState.RUNNING);
-            electionNotStarted = new Election();
+            Election electionNotStarted = new Election();
             votingServiceRunning = new VotingServiceImpl(electionRunning);
             votingServiceNotStarted = new VotingServiceImpl(electionNotStarted);
             service = Executors.newFixedThreadPool(200);
             votes = new ArrayList<>();
 
 
-            //para el testeo
+            //for testing
             PoliticalParty[] parties1 = {BUFFALO, GORILLA}; //#3
             PoliticalParty[] parties2 = {BUFFALO, GORILLA, LYNX}; //#1
             PoliticalParty[] parties3 = {BUFFALO, LYNX}; //#2
@@ -85,7 +85,7 @@ public class VotingServiceImplTest {
 
     @Test
     public void voteTest() {
-        service.execute(() -> {
+        Runnable task = (() -> {
             try {
                 votingServiceNotStarted.vote(votes);
                 fail();
@@ -95,8 +95,12 @@ public class VotingServiceImplTest {
             } catch (ElectionStateException | RemoteException e) {
                 fail();
             }
-
             assertEquals(votes, electionRunning.getVotingList());
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }

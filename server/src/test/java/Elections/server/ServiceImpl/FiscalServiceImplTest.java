@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,22 +44,22 @@ public class FiscalServiceImplTest {
     }
 
     @Test
-    public void addInspectorSingleTest() throws RemoteException, ElectionStateException {
+    public void addInspectorSingleTest() {
 
-        service.execute(() -> {
+        Runnable task = (() -> {
             FiscalCallBack fiscalCallBack = new FiscalCallBack() {
                 @Override
-                public void notifyVote() throws RemoteException {
+                public void notifyVote() {
 
                 }
 
                 @Override
-                public void endClient() throws RemoteException {
+                public void endClient() {
 
                 }
 
                 @Override
-                public void submitError(ElectionState electionState) throws RemoteException {
+                public void submitError(ElectionState electionState) {
 
                 }
             };
@@ -78,25 +79,30 @@ public class FiscalServiceImplTest {
                 fail();
             }
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
-    public void addInspectorMultipleTest() throws RemoteException, ElectionStateException {
+    public void addInspectorMultipleTest() {
 
-        service.execute(() -> {
+        Runnable task = (() -> {
             FiscalCallBack fiscalCallBack = new FiscalCallBack() {
                 @Override
-                public void notifyVote() throws RemoteException {
+                public void notifyVote() {
 
                 }
 
                 @Override
-                public void endClient() throws RemoteException {
+                public void endClient() {
 
                 }
 
                 @Override
-                public void submitError(ElectionState electionState) throws RemoteException {
+                public void submitError(ElectionState electionState) {
 
                 }
             };
@@ -106,7 +112,7 @@ public class FiscalServiceImplTest {
                 e.printStackTrace();
             }
 
-            for (PoliticalParty pp:PoliticalParty.values()) {
+            for (PoliticalParty pp : PoliticalParty.values()) {
                 for (int i = 0; i < 20; i++) {
                     Pair<PoliticalParty, Integer> pair = new Pair<>(pp, i);
                     if (election.getFiscalClients().containsKey(pair)) {
@@ -117,6 +123,11 @@ public class FiscalServiceImplTest {
 
 
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
 }

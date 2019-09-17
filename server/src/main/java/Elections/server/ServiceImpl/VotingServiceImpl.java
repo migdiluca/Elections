@@ -62,17 +62,15 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     }
 
     private void notifyVoteToClients(Vote vote) {
-        exService.submit(() -> {
-            vote.getPreferredParties().forEach(politicalParty -> {
-                List<FiscalCallBack> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getDesk()));
-                clientsToNotify.forEach(inspectionClient -> {
-                    try {
-                        inspectionClient.notifyVote();
-                    } catch (RemoteException e) {
-                        logger.error("Remote exception while notifying client");
-                    }
-                });
+        exService.submit(() -> vote.getPreferredParties().forEach(politicalParty -> {
+            List<FiscalCallBack> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getDesk()));
+            clientsToNotify.forEach(inspectionClient -> {
+                try {
+                    inspectionClient.notifyVote();
+                } catch (RemoteException e) {
+                    logger.error("Remote exception while notifying client");
+                }
             });
-        });
+        }));
     }
 }

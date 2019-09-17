@@ -8,18 +8,19 @@ import Elections.Models.Province;
 import Elections.Models.Vote;
 import Elections.QueryService;
 import javafx.util.Pair;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static Elections.Models.PoliticalParty.*;
 import static Elections.Models.Province.JUNGLE;
-import static Elections.Models.Province.SAVANNAH;
 import static org.junit.Assert.*;
 
 public class QueryServiceImplTest {
@@ -30,11 +31,6 @@ public class QueryServiceImplTest {
 
     private static ExecutorService service;
 
-    private Election electionRunning;
-    private Election electionNotStarted;
-    private Election electionFinished;
-
-    private List<Vote> votes;
     private List<Pair<BigDecimal, PoliticalParty>> nationalList;
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> mapProvince;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> mapDesk;
@@ -42,14 +38,14 @@ public class QueryServiceImplTest {
     @Before
     public void init() {
         try {
-            electionRunning = new Election();
-            electionNotStarted = new Election();
-            electionFinished = new Election();
+            Election electionRunning = new Election();
+            Election electionNotStarted = new Election();
+            Election electionFinished = new Election();
 
             electionFinished.setElectionState(ElectionState.FINISHED);
             electionRunning.setElectionState(ElectionState.RUNNING);
 
-            votes = new ArrayList<>();
+            List<Vote> votes = new ArrayList<>();
 
 
             //Hard put a value into the final province final results
@@ -122,16 +118,21 @@ public class QueryServiceImplTest {
         }
     }
 
+    @After
+    public final void after() {
+        service.shutdownNow();
+    }
+
     @Test
     public void checkResultNationalTest() {
-        service.execute(() -> {
+        Runnable task = (() -> {
             try {
                 consultingServiceNotStarted.checkResultNational();
                 fail();
             } catch (ElectionStateException | RemoteException ignore) {
             }
             try {
-                List<Pair<BigDecimal, PoliticalParty>> result = electionRunning.getNationalFinalResults();
+                List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultNational();
                 assertEquals(result.get(0).getValue(), BUFFALO);
                 assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
 
@@ -149,11 +150,16 @@ public class QueryServiceImplTest {
             }
 
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void checkResultProvinceTest() {
-        service.execute(() -> {
+        Runnable task = (() -> {
             try {
                 consultingServiceNotStarted.checkResultProvince(JUNGLE);
                 fail();
@@ -181,14 +187,17 @@ public class QueryServiceImplTest {
                     e.printStackTrace();
                 }
             });
-
-
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void checkResultDeskTest() {
-        service.execute(() -> {
+        Runnable task = (() -> {
             try {
                 consultingServiceNotStarted.checkResultDesk(1);
                 fail();
@@ -219,6 +228,11 @@ public class QueryServiceImplTest {
 
 
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
 
