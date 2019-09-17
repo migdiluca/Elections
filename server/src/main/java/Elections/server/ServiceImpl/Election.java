@@ -28,7 +28,7 @@ public class Election {
 
     public Election() {
         electionState = ElectionState.NOT_STARTED;
-        votingList = Collections.synchronizedList(new ArrayList<>());
+        votingList = new ArrayList<>();
         partialVotes = new LongAdder[13];
         for (int i = 0; i < partialVotes.length; i++) {
             partialVotes[i] = new LongAdder();
