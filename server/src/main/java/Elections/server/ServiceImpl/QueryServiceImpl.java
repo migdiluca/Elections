@@ -45,7 +45,13 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-                return p != null ? p : electionState.getProvinceFinalResults().get(province);
+                if(p != null) {
+                    return p;
+                }else{
+                    return electionState.getProvinceFinalResults().get(province) == null ?
+                            new ArrayList<>() :
+                            electionState.getProvinceFinalResults().get(province);
+                }
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -58,7 +64,13 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
         try {
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 List<Pair<BigDecimal, PoliticalParty>> p = notCompletedResults();
-                return p != null ? p : electionState.getDeskFinalResults().get(desk);
+                if(p != null) {
+                    return p;
+                }else{
+                    return electionState.getDeskFinalResults().get(desk) == null ?
+                            new ArrayList<>() :
+                            electionState.getDeskFinalResults().get(desk);
+                }
             });
             return future.get();
         } catch (InterruptedException | ExecutionException e) {

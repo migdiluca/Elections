@@ -111,17 +111,13 @@ public class QueryClient {
             System.out.println(e.getMessage());
             return;
         }
-
-        if (results != null) {
-            System.out.println(results);
-            try {
-                CSVUtil.CSVWrite(Paths.get(client.getResultFileName()), results);
-            } catch (IOException e) {
-                System.out.println("There was an error while writing results to file: " + client.getResultFileName());
-                System.exit(1);
-            }
-        }else{
-            System.out.println("Table " + client.getDesk().get() + " has no votes.");
+        System.out.println(results);
+        try {
+            CSVUtil.CSVWrite(Paths.get(client.getResultFileName()), results);
+        } catch (IOException e) {
+            System.out.println("There was an error while writing results to file: " + client.getResultFileName());
+            System.exit(1);
         }
+
     }
 }

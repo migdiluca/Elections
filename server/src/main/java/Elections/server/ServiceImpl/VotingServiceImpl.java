@@ -56,14 +56,24 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
 
     @Override
     public void vote(Vote vote) throws ElectionStateException, RemoteException {
-        if (electionState.getElectionState().equals(ElectionState.FINISHED)||
-                electionState.getElectionState().equals(ElectionState.CALCULATING)){
-            throw new AlreadyFinishedElectionException();
+        Future<?> future = exServiceVotes.submit(() -> {
+            if (electionState.getElectionState().equals(ElectionState.FINISHED) ||
+                    electionState.getElectionState().equals(ElectionState.CALCULATING)) {
+                throw new AlreadyFinishedElectionException();
+            } else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
+                throw new ElectionsNotStartedException();
+            }
+                electionState.addToVoteList(vote);
+            return null;
+        });
+        try {
+            future.get();
+            logger.info("Total votes uploaded by now: " + electionState.getVotingList().size());
+        } catch (InterruptedException | ExecutionException  e) {
+            throw new ElectionStateException(e.getCause().getMessage());
         }
-        else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
-            throw new ElectionsNotStartedException();
-        }
-        electionState.addToVoteList(vote);
+
+        exServiceNotify.submit(() -> notifyVoteToClients(vote));
     }
 
     private void notifyVoteToClients(Vote vote) {
