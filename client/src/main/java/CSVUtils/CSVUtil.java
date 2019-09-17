@@ -21,7 +21,7 @@ public class CSVUtil {
      */
     private static void writePair(Pair<BigDecimal, PoliticalParty> pair, Writer writer) throws RuntimeException {
         try {
-            writer.write(pair.getKey().toString() + "%" + pair.getValue().name() + "\n");
+            writer.write(pair.getKey().toString() + "%;" + pair.getValue().name() + "\n");
         } catch (IOException e) {
             throw new RuntimeException();
         }
