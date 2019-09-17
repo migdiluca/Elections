@@ -4,6 +4,7 @@ import CSVUtils.Data;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Vote;
 import Elections.VotingService;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.util.*;
 
 public class VoteClient {
 
-    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where voting service is located.", required = true)
     private String ip;
 
     @Option(name = "-DvotesPath", aliases = "--file", usage = "Fully qualified path and name of votes file.", required = true)
@@ -30,12 +30,16 @@ public class VoteClient {
         this.votesFileName = votesFileName;
     }
 
-    public String getIp() {
-        return ip;
+    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where voting service is located.", required = true)
+    public void setIp(String ip) throws CmdLineException {
+        if (!ip.matches("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})")) {
+            throw new CmdLineException("Invalid ip and port address");
+        }
+        this.ip = ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIp() {
+        return ip;
     }
 
     public static void main(String[] args) {
@@ -46,12 +50,12 @@ public class VoteClient {
             System.out.println("There was a problem reading the arguments");
             System.exit(1);
         }
-        // si llegamos aca esta recibimos los argumentos de manera correcta
-        // levantamos la información del csv
+        // if it gets here, than it is receiving the args correctly
+        // getting the csv info
         Data data = new Data(Paths.get(client.getVotesFileName()));
         List<Vote> votes = new ArrayList<>(data.get());
 
-        // iniciamos la conección con el servidor
+        // starting server connection
         String[] serverAddr = client.getIp().split(":", -1);
         final VotingService vs;
         try {
@@ -67,8 +71,8 @@ public class VoteClient {
             return;
         }
 
-        // si llegamos acá es porque los comicios estaban abiertos haces unos segundos
-        // subimos los votos
+        // if it gets here than the election is open(for at least some seconds prior)
+        // sending the votes
         if (client.uploadVotes(vs, votes)) {
             System.out.println(votes.size() + " votes registered");
         }

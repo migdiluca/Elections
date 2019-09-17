@@ -75,12 +75,14 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
                     throw new ElectionsNotStartedException();
                 } else if (electionState.getElectionState().equals(ElectionState.RUNNING)) {
                     List<Pair<BigDecimal, PoliticalParty>> retList = new ArrayList<>();
-                    for (int i = 0; i < PoliticalParty.values().length; i++) {
-                        PoliticalParty p = PoliticalParty.values()[i];
-                        retList.add(new Pair<>(new BigDecimal(
-                                100 * electionState.getPartialVotes()[i] / (double) electionState.getAmountOfVotes()).setScale(2, BigDecimal.ROUND_DOWN), p));
+                    if (electionState.getAmountOfVotes() > 0) {
+                        for (int i = 0; i < PoliticalParty.values().length; i++) {
+                            PoliticalParty p = PoliticalParty.values()[i];
+                            retList.add(new Pair<>(new BigDecimal(
+                                    100 * electionState.getPartialVotes()[i] / (double) electionState.getAmountOfVotes()).setScale(2, BigDecimal.ROUND_DOWN), p));
+                        }
+                        retList.sort(VotingSystems.cmp);
                     }
-                    retList.sort(VotingSystems.cmp);
                     return retList;
                 } else {
                     return null;

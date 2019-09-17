@@ -7,6 +7,7 @@ import Elections.Exceptions.ElectionStateException;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import javafx.util.Pair;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
@@ -21,7 +22,6 @@ import java.util.Optional;
 
 public class QueryClient {
 
-    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the query service is located.", required = true)
     private String ip;
 
     @Option(name = "-Dstate", forbids = {"-Did"}, aliases = "--stateName", usage = "Name of province to query")
@@ -33,12 +33,16 @@ public class QueryClient {
     @Option(name = "-DoutPath", aliases = "--file", usage = "Fully qualified path and name of file to output results.", required = true)
     private String votesFileName;
 
-    public String getIp() {
-        return ip;
+    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the query service is located.", required = true)
+    public void setIp(String ip) throws CmdLineException {
+        if (!ip.matches("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})")) {
+            throw new CmdLineException("Invalid ip and port address");
+        }
+        this.ip = ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIp() {
+        return ip;
     }
 
     public Optional<Province> getState() {
@@ -74,8 +78,9 @@ public class QueryClient {
             System.exit(1);
         }
 
-        // si llegamos aca esta recibimos los argumentos de manera correcta
-        // iniciamos la conección con el servicio de query
+        // if it gets here, than it is receiving the args correctly
+        //starting the connection with query service
+
         String[] arr = client.getIp().split(":", -1);
         final QueryService cs;
         final ManagementService as;

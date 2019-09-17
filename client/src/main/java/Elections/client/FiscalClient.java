@@ -5,6 +5,7 @@ import Elections.FiscalCallBack;
 import Elections.FiscalService;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
@@ -18,7 +19,6 @@ import static java.lang.System.exit;
 
 public class FiscalClient implements FiscalCallBack {
 
-    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the fiscal service is located.", required = true)
     private String ip;
 
     @Option(name = "-Dparty", aliases = "--partyName", usage = "Name of political party to inspect", required = true)
@@ -27,12 +27,16 @@ public class FiscalClient implements FiscalCallBack {
     @Option(name = "-Did", aliases = "--pollingPlaceNumber", usage = "Desk number to inspect", required = true)
     private Integer desk;
 
-    public String getIp() {
-        return ip;
+    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the fiscal service is located.", required = true)
+    public void setIp(String ip) throws CmdLineException {
+        if (!ip.matches("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})")) {
+            throw new CmdLineException("Invalid ip and port address");
+        }
+        this.ip = ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIp() {
+        return ip;
     }
 
     public PoliticalParty getParty() {
@@ -60,7 +64,7 @@ public class FiscalClient implements FiscalCallBack {
             exit(1);
         }
 
-        // Iniciamos la conección con el servidor
+        // Start the connection with the server
         String[] serverAddr = client.getIp().split(":", -1);
         final FiscalService is;
         try {
@@ -74,7 +78,7 @@ public class FiscalClient implements FiscalCallBack {
             return;
         }
 
-        // creamos objeto remoto
+        // create remote object
         try {
             UnicastRemoteObject.exportObject(client, 0);
         } catch (RemoteException e) {
@@ -82,7 +86,7 @@ public class FiscalClient implements FiscalCallBack {
             return;
         }
 
-        // Registramos la funcion de callback del cliente
+        // register client callback function
         try {
             is.addInspector(client, client.getParty(), client.getDesk());
         } catch (RemoteException e) {
@@ -93,7 +97,7 @@ public class FiscalClient implements FiscalCallBack {
             return;
         }
 
-        // Nos registramos correctamente
+        // Correctly registered
         System.out.println("Fiscal of " + client.getParty().name() + " registered on polling place " + client.getDesk());
     }
 
