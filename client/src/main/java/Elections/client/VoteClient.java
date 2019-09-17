@@ -54,7 +54,7 @@ public class VoteClient {
         // getting the csv info
         List<Vote> votes = null;
         try {
-            votes = CSVUtil.CSVRead(Paths.get(client.getVotesFileName()), Vote.class);
+            votes = CSVUtil.CSVRead(Paths.get(client.getVotesFileName()));
         } catch (Exception e) {
             System.err.println("An error has been encountered while reading votes file");
             System.err.println("Exiting...");

@@ -1,6 +1,7 @@
 package CSVUtils;
 
 import Elections.Models.PoliticalParty;
+import Elections.Models.Vote;
 import com.opencsv.bean.*;
 import javafx.util.Pair;
 
@@ -40,17 +41,17 @@ public class CSVUtil {
         }
     }
 
-    public static List CSVRead(Path path, Class bean) throws Exception {
-        ColumnPositionMappingStrategy ms = new ColumnPositionMappingStrategy();
-        ms.setType(bean);
+    public static List<Vote> CSVRead(Path path) throws Exception {
+        ColumnPositionMappingStrategy<Vote> ms = new ColumnPositionMappingStrategy<Vote>();
+        ms.setType(Vote.class);
 
         Reader reader = Files.newBufferedReader(path);
 
-        CsvToBean cb = new CsvToBeanBuilder(reader)
+        CsvToBean<Vote> cb = new CsvToBeanBuilder<Vote>(reader)
                 .withMappingStrategy(ms)
                 .withSeparator(';')
                 .build();
-        List beanList = cb.parse();
+        List<Vote> beanList = cb.parse();
         reader.close();
         return beanList;
     }
