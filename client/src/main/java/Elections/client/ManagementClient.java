@@ -51,7 +51,7 @@ public class ManagementClient {
             System.exit(1);
         }
 
-        // iniciamos la conección con el servidor
+        // start server connection
         String[] serverAddr = client.getIp().split(":", -1);
         final ManagementService as;
         try {

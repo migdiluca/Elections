@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 import static Elections.Models.PoliticalParty.GORILLA;
@@ -18,12 +17,11 @@ import static org.junit.Assert.*;
 
 public class VotingSystemsTest {
 
-    List<Vote> votes;
-    VotingSystems votingSystems;
+    private VotingSystems votingSystems;
 
     @Before
-    public void setUp() throws Exception {
-        votes = new LinkedList<>();
+    public void setUp() {
+        List<Vote> votes = new LinkedList<>();
         PoliticalParty[] parties1 = {BUFFALO, GORILLA}; //#3
         PoliticalParty[] parties2 = {BUFFALO, GORILLA, LYNX}; //#1
         PoliticalParty[] parties3 = {BUFFALO, LYNX}; //#2
@@ -40,7 +38,6 @@ public class VotingSystemsTest {
         Vote v8 = new Vote(3, new ArrayList<>(Arrays.asList(parties2)), SAVANNAH);
         Vote v9 = new Vote(4, new ArrayList<>(Arrays.asList(parties4)), SAVANNAH);
         Vote v10 = new Vote(4, new ArrayList<>(Arrays.asList(parties1)), SAVANNAH);
-        Vote[] votesArr = {v1, v2, v3, v4, v5, v6, v7, v8, v9, v10};
         votes.add(v1);
         votes.add(v2);
         votes.add(v3);
@@ -55,11 +52,11 @@ public class VotingSystemsTest {
     }
 
     @Test
-    public void alternativeVoteNationalLevel() throws Exception {
+    public void alternativeVoteNationalLevel() {
         List<Pair<BigDecimal, PoliticalParty>> result = votingSystems.alternativeVoteNationalLevel();
 
         /*
-         * Los resultados esperados para este sistema fueron obtenidos con el siguiente motor: http://condorcet.ericgorr.net
+         * The expected results to this system were obtained using this page: http://condorcet.ericgorr.net
          */
 
         assertEquals(result.get(0).getValue(), BUFFALO);
@@ -73,7 +70,7 @@ public class VotingSystemsTest {
     }
 
     @Test
-    public void calculateDeskResults() throws Exception {
+    public void calculateDeskResults() {
         Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> results = votingSystems.calculateDeskResults();
 
         List<Pair<BigDecimal, PoliticalParty>> desk1 = new LinkedList<>();
@@ -82,7 +79,7 @@ public class VotingSystemsTest {
         List<Pair<BigDecimal, PoliticalParty>> desk4 = new LinkedList<>();
 
         /*
-         * Estos resultados fueron calculados a mano
+         * This results were calculated prior to the test
          */
 
         desk1.add(new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));desk1.add(new Pair<>(new BigDecimal(66.66).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
@@ -96,7 +93,7 @@ public class VotingSystemsTest {
         expectedResults.put(4, desk4);
 
         assertTrue(results.entrySet().stream().allMatch((entry) ->
-                // iguales por ambos lados
+                // equal on both sides
                 expectedResults.get(entry.getKey()).containsAll(entry.getValue()) && entry.getValue().containsAll(expectedResults.get(entry.getKey()))
         ));
     }

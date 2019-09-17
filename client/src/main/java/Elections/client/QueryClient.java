@@ -78,8 +78,9 @@ public class QueryClient {
             System.exit(1);
         }
 
-        // si llegamos aca esta recibimos los argumentos de manera correcta
-        // iniciamos la conección con el servicio de query
+        // if it gets here, than it is receiving the args correctly
+        //starting the connection with query service
+
         String[] arr = client.getIp().split(":", -1);
         final QueryService cs;
         final ManagementService as;

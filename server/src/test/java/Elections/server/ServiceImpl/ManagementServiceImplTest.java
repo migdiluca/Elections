@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,7 +47,7 @@ public class ManagementServiceImplTest {
 
     @Test
     public void openElectionsTest() {
-        service.execute(() -> {
+        Runnable task = (() -> {
             try {
                 administrationService.openElections();
             } catch (ElectionStateException | RemoteException exception) {
@@ -59,6 +60,11 @@ public class ManagementServiceImplTest {
                 assertEquals(administrationService.getElection().getElectionState(), ElectionState.RUNNING);
             }
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -74,7 +80,7 @@ public class ManagementServiceImplTest {
 
     @Test
     public void closeElectionsTest() {
-        service.execute(() -> {
+        Runnable task = (() -> {
             try{
                 administrationService.finishElections();
                 fail();
@@ -93,5 +99,10 @@ public class ManagementServiceImplTest {
             }
 
         });
+        try {
+            service.submit(task).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }
