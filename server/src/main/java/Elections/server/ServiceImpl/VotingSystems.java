@@ -100,7 +100,7 @@ public class VotingSystems {
     /*
        Retorna Pair(porcentaje de votos, partido politico) del ganador de la eleccion
     */
-    public List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
+    List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
         Map<PoliticalParty, List<Vote>> masterMap = votes.stream()
                 .collect(Collectors.groupingBy(vote -> vote.getPreferredParties().get(0)));
         List<Pair<BigDecimal, PoliticalParty>> result = alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
@@ -108,7 +108,7 @@ public class VotingSystems {
         return result;
     }
 
-    public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> calculateDeskResults() {
+    Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> calculateDeskResults() {
         Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
         Map<Integer, List<Vote>> votesPerDesk = votes.stream()
                 .collect(Collectors.groupingBy(Vote::getDesk));
@@ -127,7 +127,7 @@ public class VotingSystems {
     private final int WINNERS_PER_PROVINCE = 5;
     // We asume that there will never be an election where #candidates <= WINNERS_PER_PROVINCE
 
-    public List<Pair<BigDecimal, PoliticalParty>> stVoteProvicialLevel(Province prov) {
+    List<Pair<BigDecimal, PoliticalParty>> stVoteProvicialLevel(Province prov) {
         Supplier<Stream<Vote>> supplier = () -> votes.stream().filter(x -> x.getProvince() == prov);
         long provinceCount = supplier.get().count();
         if (provinceCount <= 0) {
@@ -296,27 +296,6 @@ public class VotingSystems {
                 buffer.get(preferredParties.get(2)).add(new WVote(vote.getDesk(), newParties, vote.getProvince(), extraVoteWeight));
             }
         }
-    }
-
-
-    public static void main(String[] args) {
-        List<Vote> votes = new ArrayList<>();
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.LYNX), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.BUFFALO, PoliticalParty.LYNX), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.BUFFALO, PoliticalParty.LYNX), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.BUFFALO, PoliticalParty.LYNX), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.GORILLA), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.GORILLA, PoliticalParty.WHITE_GORILLA), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.GORILLA, PoliticalParty.JACKALOPE), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.WHITE_GORILLA), Province.JUNGLE));
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.JACKALOPE), Province.JUNGLE));
-
-        votes.add(new Vote(1, Arrays.asList(PoliticalParty.LEOPARD, PoliticalParty.WHITE_GORILLA), Province.JUNGLE));
-
-        Collections.shuffle(votes);
-        VotingSystems vs = new VotingSystems(votes);
-        List<Pair<BigDecimal,PoliticalParty>> resp = vs.stVoteProvicialLevel(Province.JUNGLE);
-        resp.forEach(c -> System.out.println(c.getKey() + ";" + c.getValue()));
     }
 
     private class WVote extends Vote {

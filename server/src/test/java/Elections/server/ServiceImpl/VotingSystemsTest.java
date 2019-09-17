@@ -1,6 +1,7 @@
 package Elections.server.ServiceImpl;
 
 import Elections.Models.PoliticalParty;
+import Elections.Models.Province;
 import Elections.Models.Vote;
 import javafx.util.Pair;
 import org.junit.Before;
@@ -48,6 +49,8 @@ public class VotingSystemsTest {
         votes.add(v8);
         votes.add(v9);
         votes.add(v10);
+        // We shuffle so that the algorithm is independent from the order of insertion
+        Collections.shuffle(votes);
         votingSystems = new VotingSystems(votes);
     }
 
@@ -69,6 +72,23 @@ public class VotingSystemsTest {
         assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
     }
 
+    @Test
+    public void stVoteProvintialLeve1() {
+        List<Pair<BigDecimal, PoliticalParty>> result = votingSystems.stVoteProvicialLevel(JUNGLE);
+        assertEquals(result.get(0), new Pair<>(new BigDecimal(50.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
+        assertEquals(result.get(1), new Pair<>(new BigDecimal(33.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));
+        assertEquals(result.get(2), new Pair<>(new BigDecimal(26.66).setScale(2, BigDecimal.ROUND_HALF_DOWN), LYNX));
+        assertEquals(result.get(3), new Pair<>(new BigDecimal(23.33).setScale(2, BigDecimal.ROUND_HALF_DOWN), OWL));
+        assertEquals(result.get(4), new Pair<>(new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), GORILLA));
+
+        result = votingSystems.stVoteProvicialLevel(SAVANNAH);
+        assertEquals(result.get(0), new Pair<>(new BigDecimal(75.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), BUFFALO));
+        assertEquals(result.get(1), new Pair<>(new BigDecimal(55.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), GORILLA));
+        assertEquals(result.get(2), new Pair<>(new BigDecimal(25.00).setScale(2, BigDecimal.ROUND_HALF_DOWN), MONKEY));
+        assertEquals(result.get(3), new Pair<>(new BigDecimal(4.99).setScale(2, BigDecimal.ROUND_HALF_DOWN), LYNX));
+
+        assertNull(votingSystems.stVoteProvicialLevel(TUNDRA));
+    }
     @Test
     public void calculateDeskResults() {
         Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> results = votingSystems.calculateDeskResults();
