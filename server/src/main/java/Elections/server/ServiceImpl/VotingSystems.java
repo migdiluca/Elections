@@ -20,7 +20,6 @@ public class VotingSystems {
     private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByPercentage = (a1, a2) -> a2.getKey().compareTo(a1.getKey());
     private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByName = Comparator.comparing(p -> p.getValue().name());
     public final static Comparator<Pair<BigDecimal, PoliticalParty>> cmp = cmpByPercentage.thenComparing(cmpByName);
-    // o poner en la clase Election
 
     public VotingSystems(List<Vote> votes) {
         this.votes = votes;
@@ -85,14 +84,15 @@ public class VotingSystems {
                     e.getKey())).collect(Collectors.toList());
         }
         Map.Entry<PoliticalParty, List<Vote>> loser = sortedEntries.get(sortedEntries.size() - 1);
-        /* todo: el perdedor podria haber empatado con otro candidato -> alternativas:
-        1- random sacar a uno
-        2- sacar a los 2
-        3- algun tipo de decision sobre estadistica en las rondas anteriores
-        */
-        masterMap.remove(loser.getKey());
-        eliminatedParties.add(loser.getKey());
-        int trasnferredVotes = transferVotesAV(masterMap, eliminatedParties, loser.getValue());
+        List<Map.Entry<PoliticalParty, List<Vote>>> losers = sortedEntries.stream().filter(e -> e.getValue().size() == loser.getValue().size()).collect(Collectors.toList());
+
+        losers.forEach(l -> masterMap.remove(l.getKey()));
+        losers.forEach(l -> eliminatedParties.add(l.getKey()));
+
+        int trasnferredVotes = 0;
+        for (Map.Entry<PoliticalParty, List<Vote>> e : losers) {
+            trasnferredVotes += transferVotesAV(masterMap, eliminatedParties, e.getValue());
+        }
         int votesLost = loser.getValue().size() - trasnferredVotes;
         return alternativeVoteNationalLevelREC(masterMap, eliminatedParties, total - votesLost);
     }
