@@ -1,6 +1,6 @@
 package Elections.client;
 
-import CSVUtils.Data;
+import CSVUtils.CSVUtil;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Vote;
 import Elections.VotingService;
@@ -52,8 +52,14 @@ public class VoteClient {
         }
         // if it gets here, than it is receiving the args correctly
         // getting the csv info
-        Data data = new Data(Paths.get(client.getVotesFileName()));
-        List<Vote> votes = new ArrayList<>(data.get());
+        List<Vote> votes = null;
+        try {
+            votes = CSVUtil.CSVRead(Paths.get(client.getVotesFileName()), Vote.class);
+        } catch (Exception e) {
+            System.err.println("An error has been encountered while reading votes file");
+            System.err.println("Exiting...");
+            System.exit(1);
+        }
 
         // starting server connection
         String[] serverAddr = client.getIp().split(":", -1);
@@ -74,10 +80,9 @@ public class VoteClient {
         if (client.uploadVotes(vs, votes)) {
             System.out.println(votes.size() + " votes registered");
         }
-
     }
 
-    private boolean uploadVotes(VotingService vs, List<Vote> votes){
+    private boolean uploadVotes(VotingService vs, List<Vote> votes) {
         int bulkPacketsAmount = (int) Math.ceil(votes.size() / VotingService.bulkSize);
         try {
             for (int i = 0; i < bulkPacketsAmount; i++) {
@@ -92,7 +97,6 @@ public class VoteClient {
             System.err.println(e.getMessage());
             return false;
         }
-
         return true;
     }
 }

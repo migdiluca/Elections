@@ -1,6 +1,6 @@
 package Elections.client;
 
-import CSVUtils.CSVWrite;
+import CSVUtils.CSVUtil;
 import Elections.ManagementService;
 import Elections.QueryService;
 import Elections.Exceptions.ElectionStateException;
@@ -31,7 +31,7 @@ public class QueryClient {
     private Integer desk;
 
     @Option(name = "-DoutPath", aliases = "--file", usage = "Fully qualified path and name of file to output results.", required = true)
-    private String votesFileName;
+    private String resultFileName;
 
     @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the query service is located.", required = true)
     public void setIp(String ip) throws CmdLineException {
@@ -61,12 +61,12 @@ public class QueryClient {
         this.desk = desk;
     }
 
-    public String getVotesFileName() {
-        return votesFileName;
+    public String getResultFileName() {
+        return resultFileName;
     }
 
-    public void setVotesFileName(String votesFileName) {
-        this.votesFileName = votesFileName;
+    public void setResultFileName(String resultFileName) {
+        this.resultFileName = resultFileName;
     }
 
     public static void main(String[] args) {
@@ -113,6 +113,11 @@ public class QueryClient {
         }
 
         System.out.println(results);
-        CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
+        try {
+            CSVUtil.CSVWrite(Paths.get(client.getResultFileName()), results);
+        } catch (IOException e) {
+            System.out.println("There was an error while writing results to file: " + client.getResultFileName());
+            System.exit(1);
+        }
     }
 }
