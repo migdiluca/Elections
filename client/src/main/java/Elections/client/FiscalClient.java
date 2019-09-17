@@ -72,9 +72,11 @@ public class FiscalClient implements FiscalCallBack {
             is = (FiscalService) registry.lookup(FiscalService.SERVICE_NAME);
         } catch (NotBoundException e) {
             System.out.println("There where problems finding the service needed service");
+            exit(1);
             return;
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
+            exit(1);
             return;
         }
 
@@ -83,7 +85,7 @@ public class FiscalClient implements FiscalCallBack {
             UnicastRemoteObject.exportObject(client, 0);
         } catch (RemoteException e) {
             System.out.println("There was a problem.");
-            return;
+            exit(1);
         }
 
         // register client callback function
@@ -91,10 +93,10 @@ public class FiscalClient implements FiscalCallBack {
             is.addInspector(client, client.getParty(), client.getDesk());
         } catch (RemoteException e) {
             System.out.println("Could not reach service");
-            return;
+            exit(1);
         } catch (ElectionStateException e) {
             System.out.println("Elections are closed or already started");
-            return;
+            exit(1);
         }
 
         // Correctly registered
