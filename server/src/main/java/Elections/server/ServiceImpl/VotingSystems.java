@@ -368,4 +368,22 @@ public class VotingSystems {
                     '}';
         }
     }
+
+    public static void main(String[] args) {
+        int VOTES_COUNT = 4000000;
+        int DESK = 1;
+        List<Vote> votes = new ArrayList<>();
+        Random rand = new Random();
+        List<PoliticalParty> parties = Arrays.asList(PoliticalParty.values());
+        int num;
+        for (int i = 0; i < VOTES_COUNT; i++) {
+            //Collections.shuffle(parties);
+            num = rand.nextInt(7); // tocando esto podemos hacer la votación más o menos parcial/random
+            votes.add(new Vote(DESK, new ArrayList<>(parties.subList(num, num + 3)) , Province.values()[rand.nextInt(3)]));
+        }
+        VotingSystems vs = new VotingSystems(votes);
+        for (Province prov : Province.values()) {
+            System.out.println(vs.stVoteProvicialLevel(prov));
+        }
+    }
 }
