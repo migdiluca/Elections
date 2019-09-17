@@ -31,7 +31,8 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     @Override
     public void vote(List<Vote> votes) throws ElectionStateException, RemoteException {
         Future<?> future = exService.submit(() -> {
-            if (electionState.getElectionState().equals(ElectionState.FINISHED)) {
+            if (electionState.getElectionState().equals(ElectionState.FINISHED) ||
+                    electionState.getElectionState().equals(ElectionState.CALCULATING)) {
                 throw new AlreadyFinishedElectionException();
             } else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
                 throw new ElectionsNotStartedException();
@@ -52,7 +53,8 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
 
     @Override
     public void vote(Vote vote) throws ElectionStateException, RemoteException {
-        if (electionState.getElectionState().equals(ElectionState.FINISHED)){
+        if (electionState.getElectionState().equals(ElectionState.FINISHED)||
+                electionState.getElectionState().equals(ElectionState.CALCULATING)){
             throw new AlreadyFinishedElectionException();
         }
         else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)){

@@ -29,6 +29,8 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
     private ExecutorService exService;
     private VotingSystems votingSystems;
 
+    private final Object mutex = "calculating results";
+
     public ManagementServiceImpl(int port) throws RemoteException {
         super(port);
         exService = Executors.newFixedThreadPool(12);
@@ -63,27 +65,26 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
     }
 
     @Override
-    public synchronized void finishElections() throws ElectionStateException, RemoteException {
-        if (election.getElectionState().equals(ElectionState.NOT_STARTED))
-            throw new ElectionsNotStartedException();
-        if (election.getElectionState().equals(ElectionState.FINISHED)) {
-            throw new AlreadyFinishedElectionException();
+    public void finishElections() throws ElectionStateException, RemoteException {
+        synchronized (mutex) {
+            if (election.getElectionState().equals(ElectionState.NOT_STARTED))
+                throw new ElectionsNotStartedException();
+            if (election.getElectionState().equals(ElectionState.FINISHED)) {
+                throw new AlreadyFinishedElectionException();
+            }
+            election.setElectionState(ElectionState.CALCULATING);
         }
-        election.setElectionState(ElectionState.FINISHED);
-
         this.votingSystems = new VotingSystems(election.getVotingList());
         election.setDeskFinalResults(votingSystems.calculateDeskResults());
         election.setNationalFinalResults(votingSystems.alternativeVoteNationalLevel());
 
-        //FIXME: hardcodeado para testeo
-
         Map<Province, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
-        for (Province p: Province.values()) {
-            List<Pair<BigDecimal, PoliticalParty>> l = new ArrayList<>();
-            l.add(new Pair<>(new BigDecimal(50.0), PoliticalParty.BUFFALO));
-            map.put(p,l);
+        for (Province p : Province.values()) {
+            map.put(p,votingSystems.stVoteProvicialLevel(p));
         }
         election.setProvinceFinalResults(map);
+
+        election.setElectionState(ElectionState.FINISHED);
 
         notifyEndToClients();
     }
