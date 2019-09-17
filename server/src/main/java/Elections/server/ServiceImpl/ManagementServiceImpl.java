@@ -24,7 +24,6 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     private Election election;
     private ExecutorService exService;
-    private VotingSystems votingSystems;
 
     private final Object mutex = "calculating results";
 
@@ -73,13 +72,13 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
             }
             election.setElectionState(ElectionState.CALCULATING);
         }
-        this.votingSystems = new VotingSystems(election.getVotingList());
+        VotingSystems votingSystems = new VotingSystems(election.getVotingList());
         election.setDeskFinalResults(votingSystems.calculateDeskResults());
         election.setNationalFinalResults(votingSystems.alternativeVoteNationalLevel());
 
         Map<Province, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
         for (Province p : Province.values()) {
-            map.put(p,votingSystems.stVoteProvicialLevel(p));
+            map.put(p, votingSystems.stVoteProvicialLevel(p));
         }
         election.setProvinceFinalResults(map);
 
@@ -89,14 +88,12 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
     }
 
     private void notifyEndToClients() {
-        election.getFiscalClients().forEach((pair, clientList) -> {
-            clientList.forEach(client -> {
-                try {
-                    client.endClient();
-                } catch (RemoteException e) {
-                    System.out.println("Remote exception while ending client");
-                }
-            });
-        });
+        election.getFiscalClients().forEach((pair, clientList) -> clientList.forEach(client -> {
+            try {
+                client.endClient();
+            } catch (RemoteException e) {
+                System.out.println("Remote exception while ending client");
+            }
+        }));
     }
 }

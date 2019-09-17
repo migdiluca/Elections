@@ -88,14 +88,14 @@ public class QueryClient {
             final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
             cs = (QueryService) registry.lookup(QueryService.SERVICE_NAME);
         } catch (RemoteException e) {
-            System.out.println("There where problems finding the registry at ip: " + client.getIp());
+            System.out.println("There were problems finding the registry at ip: " + client.getIp());
             return;
         } catch (NotBoundException e) {
-            System.out.println("There where problems finding the service needed service ");
+            System.out.println("There were problems finding the service needed service ");
             return;
         }
 
-        List<Pair<BigDecimal, PoliticalParty>> results = null;
+        List<Pair<BigDecimal, PoliticalParty>> results;
         try {
             if (client.getDesk().isPresent()) {
                 results = cs.checkResultDesk(client.getDesk().get());
@@ -105,14 +105,17 @@ public class QueryClient {
                 results = cs.checkResultNational();
             }
         } catch (RemoteException e) {
-            System.out.println("There was an error retriving results from" + QueryService.SERVICE_NAME);
+            System.out.println("There was an error retrieving results from " + QueryService.SERVICE_NAME);
             return;
         } catch (ElectionStateException e) {
             System.out.println(e.getMessage());
             return;
         }
-
-        System.out.println(results);
-        CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
+        if (results != null) {
+            System.out.println(results);
+            CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
+        }else{
+            System.out.println("Table " + client.getDesk().get() + " has no votes.");
+        }
     }
 }
