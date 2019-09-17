@@ -24,6 +24,8 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
     private ExecutorService exService;
     private static Logger logger = LoggerFactory.getLogger(Server.class);
 
+    private Object addClientMutex = "Add client mutex";
+
     public FiscalServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
         exService = Executors.newFixedThreadPool(12);
@@ -42,11 +44,15 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
 
         Future<?> future = exService.submit(() -> {
             Pair<PoliticalParty, Integer> votePair = new Pair<>(party, desk);
-            electionState.getFiscalClients().computeIfPresent(votePair, (key, clientsList) -> {
-                clientsList.add(fiscalCallBack);
-                return clientsList;
-            });
-            electionState.getFiscalClients().computeIfAbsent(votePair, clientsList -> Collections.synchronizedList(new ArrayList<>())).add(fiscalCallBack);
+            synchronized (addClientMutex) {
+                electionState.getFiscalClients().computeIfPresent(votePair, (key, clientsList) -> {
+                    synchronized (clientsList) {
+                        clientsList.add(fiscalCallBack);
+                    }
+                    return clientsList;
+                });
+                electionState.getFiscalClients().computeIfAbsent(votePair, clientsList -> new ArrayList<>()).add(fiscalCallBack);
+            }
         });
         try {
             future.get();
