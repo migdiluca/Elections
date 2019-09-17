@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface VotingService extends Remote {
+
     int bulkSize = 1000;
     String SERVICE_NAME = "voting_service";
 
@@ -20,7 +21,15 @@ public interface VotingService extends Remote {
      * @throws ElectionsAlreadyStartedException or
      * @throws AlreadyFinishedElectionException can be thrown
      * @param votes List with votes to be counted
-     * @return
      */
     void vote(List<Vote> votes) throws RemoteException, ElectionStateException;
+
+    /**
+     * We suggest that no more than bulkSize votes are sent per request
+     * If already open
+     * @throws ElectionsAlreadyStartedException or
+     * @throws AlreadyFinishedElectionException can be thrown
+     * @param vote vote to be counted
+     */
+    void vote(Vote vote) throws ElectionStateException, RemoteException;
 }

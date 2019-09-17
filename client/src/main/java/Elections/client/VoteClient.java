@@ -1,14 +1,11 @@
 package Elections.client;
 
 import CSVUtils.Data;
-import Elections.AdministrationService;
-import Elections.ConsultingService;
 import Elections.Exceptions.ElectionStateException;
-import Elections.Models.ElectionState;
 import Elections.Models.Vote;
 import Elections.VotingService;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
-import sun.nio.ch.ThreadPool;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -17,12 +14,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class VoteClient {
 
-    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where voting service is located.", required = true)
     private String ip;
 
     @Option(name = "-DvotesPath", aliases = "--file", usage = "Fully qualified path and name of votes file.", required = true)
@@ -36,12 +30,16 @@ public class VoteClient {
         this.votesFileName = votesFileName;
     }
 
-    public String getIp() {
-        return ip;
+    @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where voting service is located.", required = true)
+    public void setIp(String ip) throws CmdLineException {
+        if (!ip.matches("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})")) {
+            throw new CmdLineException("Invalid ip and port address");
+        }
+        this.ip = ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIp() {
+        return ip;
     }
 
     public static void main(String[] args) {
@@ -49,19 +47,19 @@ public class VoteClient {
         try {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
-            e.getMessage();
+            System.out.println("There was a problem reading the arguments");
             System.exit(1);
         }
-        // si llegamos aca esta recibimos los argumentos de manera correcta
-        // levantamos la información del csv
+        // if it gets here, than it is receiving the args correctly
+        // getting the csv info
         Data data = new Data(Paths.get(client.getVotesFileName()));
         List<Vote> votes = new ArrayList<>(data.get());
 
-        // iniciamos la conección con el servidor
-        String[] arr = client.getIp().split(":", -1);
+        // starting server connection
+        String[] serverAddr = client.getIp().split(":", -1);
         final VotingService vs;
         try {
-            final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
+            final Registry registry = LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1]));
             vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.err.println("There where problems finding the registry at ip: " + client.getIp());
@@ -73,8 +71,8 @@ public class VoteClient {
             return;
         }
 
-        // si llegamos acá es porque los comicios estaban abiertos haces unos segundos
-        // subimos los votos
+        // if it gets here than the election is open(for at least some seconds prior)
+        // sending the votes
         if (client.uploadVotes(vs, votes)) {
             System.out.println(votes.size() + " votes registered");
         }
@@ -100,90 +98,4 @@ public class VoteClient {
 
         return true;
     }
-
-    /*
-    * public static void main(String[] args) {
-        VoteClient client = new VoteClient();
-        try {
-            CmdParserUtils.init(args, client);
-        } catch (IOException e) {
-            e.getMessage();
-            System.exit(1);
-        }
-        // si llegamos aca esta recibimos los argumentos de manera correcta
-        // levantamos la información del csv
-        Data data = new Data(Paths.get(client.getVotesFileName()));
-        List<Vote> votes = new ArrayList<>(data.get());
-
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 100; i++) {
-            executor.submit(() -> {
-                // iniciamos la conección con el servidor
-                String[] arr = client.getIp().split(":", -1);
-                final VotingService vs;
-                final AdministrationService as;
-                try {
-                    final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
-                    vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
-                    as = (AdministrationService) registry.lookup(AdministrationService.SERVICE_NAME);
-                    // TODO borrar esto
-                    // solo por testeo vamos a habilitarlas
-                    as.openElections();
-                    if (as.getElectionState() != ElectionState.RUNNING) {
-                        throw new ElectionStateException();
-                    }
-                } catch (RemoteException e) {
-                    System.err.println("There where problems finding the registry at ip: " + client.getIp());
-                    System.err.println(e.getMessage());
-                    return;
-                } catch (NotBoundException e) {
-                    System.err.println("There where problems finding the service needed service ");
-                    System.err.println(e.getMessage());
-                    return;
-                } catch (ElectionStateException e) {
-                    System.err.println(e.getMessage()!=null? e.getMessage(): "Elections are not open");
-                    return;
-                }
-
-                // si llegamos acá es porque los comicios estaban abiertos haces unos segundos
-                // subimos los votos
-                if (client.uploadVotes(vs, votes)) {
-                    System.out.println(votes.size() + " votes registered");
-
-                }
-            });
-        }
-        try {
-            System.out.println("Esperando" + new Date());
-            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-            }
-            String[] arr = client.getIp().split(":", -1);
-            final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
-            final VotingService vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
-            System.out.println(vs.getCount());
-        } catch (InterruptedException | RemoteException | NotBoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean uploadVotes(VotingService vs, List<Vote> votes){
-        int bulkPacketsAmount = (int) Math.ceil(votes.size() / VotingService.bulkSize);
-        try {
-            for (int i = 0; i < bulkPacketsAmount; i++) {
-                List<Vote> sublist = new ArrayList<>(votes.subList(i * bulkPacketsAmount, i * bulkPacketsAmount + VotingService.bulkSize));
-                vs.vote(sublist);
-            }
-        } catch (RemoteException e) {
-            System.err.println("There was an error uploading the votes" + VotingService.SERVICE_NAME);
-            System.err.println(e.getMessage());
-            return false;
-        } catch (ElectionStateException e) {
-            System.err.println("Elections are not open: " + VotingService.SERVICE_NAME);
-            System.err.println(e.getMessage());
-            return false;
-        }
-
-        return true;
-    }*/
 }

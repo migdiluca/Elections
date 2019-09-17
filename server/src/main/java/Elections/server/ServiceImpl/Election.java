@@ -1,5 +1,6 @@
 package Elections.server.ServiceImpl;
 
+import Elections.FiscalCallBack;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
@@ -8,10 +9,9 @@ import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
-public class ElectionPOJO {
+public class Election {
 
     private ElectionState electionState;
     private List<Vote> votingList;
@@ -21,15 +21,20 @@ public class ElectionPOJO {
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults;
     private Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults;
 
-    private final Object helperA = 0;
-    private final Object helperB = 0;
-    public ElectionPOJO() {
+    private Map<Pair<PoliticalParty, Integer>,List<FiscalCallBack>> FiscalClients;
+
+    private final Object mutexVotesA = "Vote list mutex";
+    private final Object mutexVotesB = "Partial votes list mutex";
+
+    public Election() {
         electionState = ElectionState.NOT_STARTED;
-        votingList = Collections.synchronizedList(new ArrayList<>());
+        votingList = new ArrayList<>();
         partialVotes = new LongAdder[13];
         for (int i = 0; i < partialVotes.length; i++) {
             partialVotes[i] = new LongAdder();
         }
+
+        FiscalClients = Collections.synchronizedMap(new HashMap<>());
 
         nationalFinalResults = new ArrayList<>();
         provinceFinalResults = new HashMap<>();
@@ -40,10 +45,10 @@ public class ElectionPOJO {
     }
 
     void addToVoteList(Vote vote) {
-        synchronized (helperA) {
+        synchronized (mutexVotesA) {
             votingList.add(vote);
         }
-        synchronized (helperB) {
+        synchronized (mutexVotesB) {
             partialVotes[vote.getPreferredParties().get(0).ordinal()].increment();
         }
     }
@@ -68,6 +73,10 @@ public class ElectionPOJO {
         return nationalFinalResults;
     }
 
+    Map<Pair<PoliticalParty, Integer>, List<FiscalCallBack>> getFiscalClients() {
+        return FiscalClients;
+    }
+
     Map<Province, List<Pair<BigDecimal, PoliticalParty>>> getProvinceFinalResults() {
         return provinceFinalResults;
     }
@@ -76,4 +85,19 @@ public class ElectionPOJO {
         return deskFinalResults;
     }
 
+    void setNationalFinalResults(List<Pair<BigDecimal, PoliticalParty>> nationalFinalResults) {
+        this.nationalFinalResults = nationalFinalResults;
+    }
+
+    void setProvinceFinalResults(Map<Province, List<Pair<BigDecimal, PoliticalParty>>> provinceFinalResults) {
+        this.provinceFinalResults = provinceFinalResults;
+    }
+
+    void setDeskFinalResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> deskFinalResults) {
+        this.deskFinalResults = deskFinalResults;
+    }
+
+    List<Vote> getVotingList() {
+        return votingList;
+    }
 }

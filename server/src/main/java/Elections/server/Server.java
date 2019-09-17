@@ -1,8 +1,8 @@
 package Elections.server;
 
-import Elections.AdministrationService;
-import Elections.ConsultingService;
-import Elections.InspectionService;
+import Elections.ManagementService;
+import Elections.QueryService;
+import Elections.FiscalService;
 import Elections.VotingService;
 import Elections.server.ServiceImpl.*;
 import org.slf4j.Logger;
@@ -14,30 +14,26 @@ import java.rmi.registry.Registry;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
-    private static final int port = 8090;
+    private static final int port = 1099;
 
     public static void main(String[] args) throws RemoteException {
 
         logger.info("Elections Server Starting ...");
 
-        ElectionPOJO electionState = new ElectionPOJO();
+        Election electionState = new Election();
 
-        AdministrationService as = new AdministrationServiceImpl(electionState);
+        ManagementService as = new ManagementServiceImpl(electionState);
         VotingService vs = new VotingServiceImpl(electionState);
-        InspectionService is = new InspectionServiceImpl(electionState);
-        ConsultingService cs = new ConsultingServiceImpl(electionState);
+        FiscalService is = new FiscalServiceImpl(electionState);
+        QueryService cs = new QueryServiceImpl(electionState);
 
         final Registry registry = LocateRegistry.createRegistry(port);
 
-        registry.rebind(AdministrationService.SERVICE_NAME, as);
+        registry.rebind(ManagementService.SERVICE_NAME, as);
         registry.rebind(VotingService.SERVICE_NAME, vs);
-        registry.rebind(InspectionService.SERVICE_NAME, is);
-        registry.rebind(ConsultingService.SERVICE_NAME, cs);
+        registry.rebind(FiscalService.SERVICE_NAME, is);
+        registry.rebind(QueryService.SERVICE_NAME, cs);
 
-        System.out.println("Server up and running: " + registry);
-        System.out.println(as);
-        System.out.println(vs);
-        System.out.println(is);
-        System.out.println(cs);
+        System.out.println("Server up and running on port:" + port);
     }
 }

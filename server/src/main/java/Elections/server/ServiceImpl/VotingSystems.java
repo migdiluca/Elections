@@ -7,6 +7,8 @@ import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -15,6 +17,10 @@ import java.util.stream.Stream;
 public class VotingSystems {
 
     private List<Vote> votes;
+    private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByPercentage = (a1, a2) -> a2.getKey().compareTo(a1.getKey());
+    private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByName = Comparator.comparing(p -> p.getValue().name());
+    public final static Comparator<Pair<BigDecimal, PoliticalParty>> cmp = cmpByPercentage.thenComparing(cmpByName);
+    // o poner en la clase Election
 
     public VotingSystems(List<Vote> votes) {
         this.votes = votes;
@@ -36,7 +42,13 @@ public class VotingSystems {
         if (i != parties.size()) {
             // hay un candidato que sigue compitiendo => se le transfiere un voto
             PoliticalParty party = parties.get(i);
-            masterMap.get(party).add(vote);
+            if (masterMap.containsKey(party)) {
+                masterMap.get(party).add(vote);
+            } else {
+                List<Vote> votes = new ArrayList<>();
+                votes.add(vote);
+                masterMap.put(party, votes);
+            }
             return true;
         }
         return false;
@@ -60,18 +72,17 @@ public class VotingSystems {
     /*
         Retorna Pair (porcentaje de votos, partido politico) del ganador de la eleccion
      */
-    private Pair<BigDecimal, PoliticalParty> alternativeVoteNationalLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, int total) {
+    private List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, int total) {
         // ordenamos el mapa
         // podria haber usado los metodos max/min de streams pero seria mas conveniente ordenarlo de una y no 2 veces
         List<Map.Entry<PoliticalParty, List<Vote>>> sortedEntries = masterMap.entrySet().stream()
                 .sorted((e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()))
                 .collect(Collectors.toList());
-        if ((sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
+        if (sortedEntries.isEmpty() || (sortedEntries.get(0).getValue().size() / (double) total) > 0.5) {
             // hay un ganador
-            return new Pair<>(
-                    new BigDecimal(sortedEntries.get(0).getValue().size() / (double) total),
-                    sortedEntries.get(0).getKey()
-            );
+            return sortedEntries.stream().map((e) -> new Pair<>(
+                    new BigDecimal((e.getValue().size() / (double) total)*100).setScale(2, BigDecimal.ROUND_DOWN),
+                    e.getKey())).collect(Collectors.toList());
         }
         Map.Entry<PoliticalParty, List<Vote>> loser = sortedEntries.get(sortedEntries.size() - 1);
         /* todo: el perdedor podria haber empatado con otro candidato -> alternativas:
@@ -89,25 +100,28 @@ public class VotingSystems {
     /*
        Retorna Pair(porcentaje de votos, partido politico) del ganador de la eleccion
     */
-    public Pair<BigDecimal, PoliticalParty> alternativeVoteNationalLevel() {
+    public List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
         Map<PoliticalParty, List<Vote>> masterMap = votes.stream()
                 .collect(Collectors.groupingBy(vote -> vote.getPreferredParties().get(0)));
-        return alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
+        List<Pair<BigDecimal, PoliticalParty>> result = alternativeVoteNationalLevelREC(masterMap, new ArrayList<>(), votes.size());
+        result.sort(cmp);
+        return result;
     }
 
-    public void calculateDeskResults(Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> entry) {
-        Map<Integer, List<Vote>> votesPerDesk =
-                votes.stream().collect(Collectors.groupingBy(Vote::getTable));
-
+    public Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> calculateDeskResults() {
+        Map<Integer, List<Pair<BigDecimal, PoliticalParty>>> map = new HashMap<>();
+        Map<Integer, List<Vote>> votesPerDesk = votes.stream()
+                .collect(Collectors.groupingBy(Vote::getDesk));
         votesPerDesk.forEach((k, v) -> {
             Map<PoliticalParty, List<Vote>> collect = v.stream().collect(Collectors.groupingBy((u) -> u.getPreferredParties().get(0)));
             List<Pair<BigDecimal, PoliticalParty>> list = new ArrayList<>();
             collect.forEach((x, y) -> {
-                list.add(new Pair<>(new BigDecimal(y.size() / v.size()), x));
+                list.add(new Pair<>(new BigDecimal(100 * y.size() / (double) v.size()).setScale(2, BigDecimal.ROUND_DOWN), x));
             });
-            list.sort((a, b) -> a.getKey().subtract(b.getKey()).intValue());
-            entry.put(k, list);
+            list.sort(cmp);
+            map.put(k, list);
         });
+        return map;
     }
 
     private final int WINNERS_PER_PROVINCE = 5;
@@ -142,14 +156,15 @@ public class VotingSystems {
                 set.add(new Pair<>(pp, new VoteList()));
         }
         // In this buffer we place the winners with the TOTAL amount of votes
-        List<Pair<PoliticalParty, VoteList>> winnersSet = new ArrayList<>();
+        List<Pair<PoliticalParty, VoteList>> winnersList = new ArrayList<>();
         // threshold is the TOTAL amount of votes a candidate need to sit at the table
         double threshold = provinceCount/(double)WINNERS_PER_PROVINCE;
-        stVoteProvicialLevelREC(set, stillCompeting, WINNERS_PER_PROVINCE, threshold, winnersSet);
+        stVoteProvicialLevelREC(set, stillCompeting, WINNERS_PER_PROVINCE, threshold, winnersList);
+
         // We return the winners with with the FRACTION of votes they won over the total amount of votes
-        return winnersSet.stream()
+        return winnersList.stream()
+                .sorted(comp.reversed())
                 .map((Pair<PoliticalParty, VoteList> p) -> new Pair<>(p.getKey(), p.getValue().votes/provinceCount))
-                .sorted(Comparator.comparingDouble(Pair::getValue))
                 .collect(Collectors.toList());
     }
 
@@ -263,7 +278,7 @@ public class VotingSystems {
                 // the new vote will have less options than before and a weight
                 List<PoliticalParty> newParties = preferredParties.subList(1, preferredParties.size());
                 // add the vote with its weight to the list
-                WVote newVote = new WVote(vote.getTable(), newParties, vote.getProvince(), extraVoteWeight);
+                WVote newVote = new WVote(vote.getDesk(), newParties, vote.getProvince(), extraVoteWeight);
                 buffer.get(preferredParties.get(1)).add(newVote);
             } else if (preferredParties.size() == 3 && stillCompeting.contains(preferredParties.get(2)) ) {
                 // third is present and it counts
@@ -271,151 +286,11 @@ public class VotingSystems {
                 // the new vote will have less options than before and a weight
                 List<PoliticalParty> newParties = preferredParties.subList(2, preferredParties.size());
                 // add the vote with its weight to the list
-                buffer.get(preferredParties.get(2)).add(new WVote(vote.getTable(), newParties, vote.getProvince(), extraVoteWeight));
+                buffer.get(preferredParties.get(2)).add(new WVote(vote.getDesk(), newParties, vote.getProvince(), extraVoteWeight));
             }
         }
     }
-/*
-    private Set<Pair<BigDecimal, PoliticalParty>> stVoteProvicialLevelREC(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> notCountingParties, long totalVotes, int availableSeats, List<Pair<BigDecimal, PoliticalParty>> stillCompeting) {
-        // caso base, no hay que iterar más
-        if (availableSeats == 0) {
-            return new HashSet<>();
-        }
-        // array para los ganadores de esta iteración;
-        Set<Pair<BigDecimal, PoliticalParty>> winnerPPs = new HashSet<>();
 
-        // Calculamos el mínimo de votos requerido para ser elegido,
-        // esto es igual al máximo de votos que se pueden adquirir por candidato.
-        // El fracción de votos que sobrepasan este threshold es redistribuido entre las segundas y terceras opciones
-        BigDecimal threshold = new BigDecimal(totalVotes / (double)availableSeats); // redondeo??
-        BigDecimal thresholdFraction = new BigDecimal(1 / (double)availableSeats); // redondeo??
-
-        // Mapa para hacer un buffer de los votos de seunga/tercera opción a ditribuir.
-        // esperamos para distribuir cosa de que recién al final de la iteración se consideren los cambios
-        Map<PoliticalParty, BigDecimal> secondChoiceBuffer = new HashMap<>();
-        for (PoliticalParty pp : PoliticalParty.values()) { secondChoiceBuffer.put(pp, new BigDecimal(0)); }
-
-        // Para cada candidato, si sobre pasa el límite, contamos las segundas/terceras opciones de sus votos
-        // para luego distribuirlos
-        int newAvailableSeats = thresholdCounting(masterMap, threshold, totalVotes, winnerPPs, notCountingParties, availableSeats, secondChoiceBuffer);
-        if (newAvailableSeats == 0) {
-            // terminamos
-            printWinners(winnerPPs);
-            return winnerPPs;
-        } else if (newAvailableSeats < 0){
-            // no se si es posible este caso
-            throw new IllegalStateException("Ganaron más personas que sillas habilitadas");
-        }
-
-        // En el caso que ningún candidato haya llegado al threshold, eliminamos a alguno que esté
-        // último en la lista y guardamos sus votos para luego distribuirlos.
-        if (newAvailableSeats == availableSeats) {
-            eliminateLoosers(masterMap, notCountingParties, threshold);
-        }
-        availableSeats = newAvailableSeats;
-
-        // TODO redistribuir los votos del buffer y generar nuevo masterMap
-        masterMap = redistributeExtraVotes();
-        // retornamos la lista de winners concatenada con los winners de otras iteraciones
-        winnerPPs.addAll(stVoteProvicialLevelREC(masterMap, notCountingParties, totalVotes, availableSeats));
-        return winnerPPs;
-    }
-
-    private void eliminateLoosers(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> notCountingParties, long threshold) {
-        // buffer para meter votos y después respartirlos al final
-        Map<PoliticalParty, List<Vote>> buffer = new HashMap<>();
-        for (PoliticalParty pp : PoliticalParty.values()) { buffer.put(pp, new ArrayList<>()); }
-
-        // iteramos por cada candidato en orden descendiente
-        List<Map.Entry<PoliticalParty, List<Vote>>> sortedEntries = new ArrayList<>(masterMap.entrySet());
-        sortedEntries.sort(Comparator.comparingInt(o -> o.getValue().size()));
-        long votesCount;
-        long oldVotesCount = sortedEntries.get(0).getValue().size();
-        for (Map.Entry<PoliticalParty, List<Vote>> e: sortedEntries) {
-            // si ya ganó o ya perdió, no lo contamos
-            if (!notCountingParties.contains(e.getKey())) {
-                break;
-            }
-            // solo sacamos el/los más perdedores, es decir sacamos de a 1 grupo de perdedores en base a la cantida de votos
-            votesCount = e.getValue().size();
-            if (votesCount != oldVotesCount) {
-                return;
-            }
-            if (votesCount < threshold) {
-                // lo eliminamos
-                notCountingParties.add(e.getKey());
-                // metemos sus votos en un buffer, al final de la función los repartimos
-                bufferExtraVotes(buffer, masterMap.get(e.getKey()), notCountingParties);
-            } else {
-                throw new IllegalStateException("Para este punto no debería suceder que algún candiato sobrepasa el threshold");
-            }
-            oldVotesCount = votesCount;
-        }
-    }
-
-    private void bufferExtraVotes(Map<PoliticalParty, List<Vote>> buffer, List<Vote> votes, List<PoliticalParty> notCountingParties) {
-
-    }
-
-    private void printWinners(Set<Pair<BigDecimal, PoliticalParty>> winnerPPs) {
-        winnerPPs.stream()
-                .sorted(Comparator.comparing(Pair::getKey))
-                .forEach(x -> {
-                    // ej : 20,00%;GORILLA
-                    // TODO format output
-                    System.out.println(x.getKey() + "%;" + x.getValue().toString());
-                });
-    }
-
-    private int thresholdCounting(Map<PoliticalParty, List<Vote>> masterMap, BigDecimal threshhold, long totalVotes, Set<Pair<BigDecimal, PoliticalParty>> winnerPPs, List<PoliticalParty> notCountingParties, int availableSeats, Map<PoliticalParty, BigDecimal> secondChoiceBuffer) {
-        // Por cada PoliticalParty nos fijamos si alguno sobre pasa el límite
-        for (PoliticalParty pp: masterMap.keySet()) {
-            BigDecimal fractionVotesPP = new BigDecimal(masterMap.get(pp).size() / (double) totalVotes);
-            if (fractionVotesPP.compareTo(threshhold) >= 0) {
-                // si es igual
-                winnerPPs.add(new Pair<>(fractionVotesPP, pp)); // agregamos a la lista de los que ya ganaron
-                notCountingParties.add(pp); // agregamos a la lista de los que no van a contar para la siguiente iteración
-                availableSeats--;           // hay 1 asiento menos
-            }
-            if (fractionVotesPP.compareTo(threshhold) > 0) {
-                // si tiene más votos que el threshold agregamos los votos extras al buffer
-                bufferExtraVotes(masterMap.get(pp), notCountingParties, secondChoiceBuffer, fractionVotesPP.subtract(threshhold).multiply(fractionVotesPP));
-            }
-            // else: fractionVotesPP < threshhold => después decidimos qué hacer
-        }
-        return availableSeats;
-    }
-
-    private void bufferExtraVotes(List<Vote> ppVotes, List<PoliticalParty> notCountingParties, Map<PoliticalParty, BigDecimal> secondChoiceBuffer, BigDecimal extraVotesWeight) {
-        // por cada voto de este candidato
-        for (Vote vote: ppVotes) {
-            // buscamos la segunda o tercera opción
-            List<PoliticalParty> preferredParties = vote.getPreferredParties();
-            if (preferredParties.size() < 2) {
-                break; // votó uno solo y entonces su voto no es transferible
-            }
-            // si llegué hasta acá, por lo menos votó a 2 candidatos
-            if (!notCountingParties.contains(preferredParties.get(1))) {
-                // entonces este voto si cuenta!
-                // agregamos la franción de la fración de votos
-                BigDecimal newFraction = secondChoiceBuffer.get(preferredParties.get(1)).add(extraVotesWeight);
-                secondChoiceBuffer.put(preferredParties.get(1), newFraction);
-                break;
-            }
-            // si llegúe hasta acá, tiene por lo menos 2 votos, pero el segundo no sirve
-            // vemos si tiene tercer voto
-            if (preferredParties.size() < 3) {
-                break; // no tuvo tercer voto y entonces su voto no es transferible
-            }
-            //si llegúe hasta acá, tiene 3 votos
-            if (notCountingParties.contains(preferredParties.get(2))) {
-                break; // entonces el tercer voto no sirve
-            }
-            // si llegúe hasta acá, el tercer voto sirve
-            BigDecimal newFraction = secondChoiceBuffer.get(preferredParties.get(2)).add(extraVotesWeight);
-            secondChoiceBuffer.put(preferredParties.get(2), newFraction);
-        }
-    }*/
 
     public static void main(String[] args) {
         List<Vote> votes = new ArrayList<>();

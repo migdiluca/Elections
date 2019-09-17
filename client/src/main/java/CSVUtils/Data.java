@@ -5,7 +5,6 @@ import Elections.Models.*;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -35,7 +34,7 @@ public class Data implements Supplier<List<Vote>> {
     @Override
     public List<Vote> get() {
         return getVotes(csvPath).stream()
-                .map(csvBean -> new Vote(csvBean.getTable(),
+                .map(csvBean -> new Vote(csvBean.getDesk(),
                         csvBean.getPoliticalParties(),
                         //                Arrays.stream(csvBean.getPoliticalPartys().split(",")).map(PoliticalParty::valueOf).collect(Collectors.toList()),
                         //                Province.valueOf(csvBean.getProvince()))
