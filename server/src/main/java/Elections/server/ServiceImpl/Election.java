@@ -34,7 +34,7 @@ public class Election {
             partialVotes[i] = new LongAdder();
         }
 
-        FiscalClients = Collections.synchronizedMap(new HashMap<>());
+        FiscalClients = new HashMap<>();
 
         nationalFinalResults = new ArrayList<>();
         provinceFinalResults = new HashMap<>();
