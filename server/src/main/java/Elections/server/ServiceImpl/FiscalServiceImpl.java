@@ -21,17 +21,17 @@ import java.util.concurrent.Future;
 public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalService {
 
     private Election electionState;
-    private ExecutorService exService;
     private static Logger logger = LoggerFactory.getLogger(Server.class);
+
+    private final Object addClientMutex = "Add client mutex";
 
     public FiscalServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
-        exService = Executors.newFixedThreadPool(12);
     }
 
     @Override
     public void addInspector(FiscalCallBack fiscalCallBack, PoliticalParty party, int desk) throws RemoteException, ElectionStateException {
-        if(!electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
+        if (!electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
             try {
                 fiscalCallBack.submitError(electionState.getElectionState());
             } catch (RemoteException e) {
@@ -40,20 +40,24 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
             return;
         }
 
-        Future<?> future = exService.submit(() -> {
-            Pair<PoliticalParty, Integer> votePair = new Pair<>(party, desk);
+        Pair<PoliticalParty, Integer> votePair = new Pair<>(party, desk);
+        synchronized (addClientMutex) {
             electionState.getFiscalClients().computeIfPresent(votePair, (key, clientsList) -> {
                 clientsList.add(fiscalCallBack);
                 return clientsList;
             });
-            electionState.getFiscalClients().computeIfAbsent(votePair, clientsList -> Collections.synchronizedList(new ArrayList<>())).add(fiscalCallBack);
-        });
-        try {
-            future.get();
-            logger.info("A fiscal has been registered in desk " + desk + "for party" + party.name());
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ElectionStateException(e.getCause().getMessage());
+            electionState.getFiscalClients().computeIfAbsent(votePair, clientsList -> new ArrayList<>()).add(fiscalCallBack);
+
+//            if (electionState.getFiscalClients().containsKey(votePair)) {
+//                electionState.getFiscalClients().get(votePair).add(fiscalCallBack);
+//            } else {
+//                List<FiscalCallBack> list = new ArrayList<>();
+//                list.add(fiscalCallBack);
+//                electionState.getFiscalClients().put(votePair, list);
+//            }
         }
+
+        logger.info("A fiscal has been registered in desk " + desk + " for party " + party.name());
 
     }
 

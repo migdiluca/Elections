@@ -11,7 +11,7 @@ import java.util.List;
 public class Vote implements Serializable {
 
     @CsvBindByPosition(position = 0)
-    private Integer desk;
+    private int desk;
 
     @CsvCustomBindByPosition(converter = ProvinceConverter.class, position = 1)
     private Province province;
@@ -25,17 +25,23 @@ public class Vote implements Serializable {
     public Vote() {
     }
 
-    public Vote(Integer desk, List<PoliticalParty> preferredParties, Province province) {
+    public Vote(int desk, List<PoliticalParty> preferredParties, Province province) {
         this.desk = desk;
         this.preferredParties = preferredParties;
         this.province = province;
     }
 
-    public Integer getDesk() {
+    public Vote(Vote v) {
+        this.desk = v.getDesk();
+        this.preferredParties = v.getPreferredParties();
+        this.province = v.getProvince();
+    }
+
+    public int getDesk() {
         return desk;
     }
 
-    public void setDesk(Integer desk) {
+    public void setDesk(int desk) {
         this.desk = desk;
     }
 

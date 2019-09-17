@@ -2,7 +2,7 @@ package Elections.Models;
 
 public enum ElectionState {
 
-    NOT_STARTED("Election are yet to start"), RUNNING("Election started"), FINISHED("Election ended");
+    NOT_STARTED("Election are yet to start"), RUNNING("Election started"), FINISHED("Election ended"), CALCULATING("Calculating results");
 
     private String desc;
 

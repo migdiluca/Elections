@@ -73,7 +73,8 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
             Future<List<Pair<BigDecimal, PoliticalParty>>> future = exService.submit(() -> {
                 if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
                     throw new ElectionsNotStartedException();
-                } else if (electionState.getElectionState().equals(ElectionState.RUNNING)) {
+                } else if (electionState.getElectionState().equals(ElectionState.RUNNING)||
+                        electionState.getElectionState().equals(ElectionState.CALCULATING)) {
                     List<Pair<BigDecimal, PoliticalParty>> retList = new ArrayList<>();
                     if (electionState.getAmountOfVotes() > 0) {
                         for (int i = 0; i < PoliticalParty.values().length; i++) {

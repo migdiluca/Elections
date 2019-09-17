@@ -21,24 +21,26 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
 
     private static Logger logger = LoggerFactory.getLogger(Server.class);
     private Election electionState;
-    private ExecutorService exService;
+    private ExecutorService exServiceVotes;
+    private ExecutorService exServiceNotify;
 
     public VotingServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
-        exService = Executors.newFixedThreadPool(12);
+        exServiceVotes = Executors.newFixedThreadPool(12);
+        exServiceNotify = Executors.newFixedThreadPool(12);
     }
 
     @Override
     public void vote(List<Vote> votes) throws ElectionStateException, RemoteException {
-        Future<?> future = exService.submit(() -> {
-            if (electionState.getElectionState().equals(ElectionState.FINISHED)) {
+        Future<?> future = exServiceVotes.submit(() -> {
+            if (electionState.getElectionState().equals(ElectionState.FINISHED) ||
+                    electionState.getElectionState().equals(ElectionState.CALCULATING)) {
                 throw new AlreadyFinishedElectionException();
             } else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
                 throw new ElectionsNotStartedException();
             }
             votes.forEach(vote -> {
                 electionState.addToVoteList(vote);
-                notifyVoteToClients(vote);
             });
             return null;
         });
@@ -48,11 +50,14 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         } catch (InterruptedException | ExecutionException  e) {
             throw new ElectionStateException(e.getCause().getMessage());
         }
+
+        exServiceNotify.submit(() -> votes.forEach(this::notifyVoteToClients));
     }
 
     @Override
     public void vote(Vote vote) throws ElectionStateException, RemoteException {
-        if (electionState.getElectionState().equals(ElectionState.FINISHED)){
+        if (electionState.getElectionState().equals(ElectionState.FINISHED)||
+                electionState.getElectionState().equals(ElectionState.CALCULATING)){
             throw new AlreadyFinishedElectionException();
         }
         else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)){
@@ -62,7 +67,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     }
 
     private void notifyVoteToClients(Vote vote) {
-        exService.submit(() -> vote.getPreferredParties().forEach(politicalParty -> {
+        vote.getPreferredParties().forEach(politicalParty -> {
             List<FiscalCallBack> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getDesk()));
             clientsToNotify.forEach(inspectionClient -> {
                 try {
@@ -71,6 +76,6 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
                     logger.error("Remote exception while notifying client");
                 }
             });
-        }));
+        });
     }
 }
