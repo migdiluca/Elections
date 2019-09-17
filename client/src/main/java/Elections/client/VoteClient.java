@@ -63,11 +63,9 @@ public class VoteClient {
             vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.err.println("There where problems finding the registry at ip: " + client.getIp());
-            System.err.println(e.getMessage());
             return;
         } catch (NotBoundException e) {
             System.err.println("There where problems finding the service needed service ");
-            System.err.println(e.getMessage());
             return;
         }
 
@@ -88,7 +86,6 @@ public class VoteClient {
             }
         } catch (RemoteException e) {
             System.err.println("There was an error uploading the votes" + VotingService.SERVICE_NAME);
-            System.err.println(e.getMessage());
             return false;
         } catch (ElectionStateException e) {
             System.err.println("Elections are not open: " + VotingService.SERVICE_NAME);
