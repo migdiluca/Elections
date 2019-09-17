@@ -51,11 +51,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
             throw new ElectionStateException(e.getCause().getMessage());
         }
 
-        exServiceNotify.submit(() -> {
-            votes.forEach(vote -> {
-                notifyVoteToClients(vote);
-            });
-        });
+        exServiceNotify.submit(() -> votes.forEach(this::notifyVoteToClients));
     }
 
     @Override
