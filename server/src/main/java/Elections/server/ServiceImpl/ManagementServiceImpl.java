@@ -23,13 +23,11 @@ import java.util.concurrent.Future;
 public class ManagementServiceImpl extends UnicastRemoteObject implements ManagementService {
 
     private Election election;
-    private ExecutorService exService;
 
     private final Object mutex = "calculating results";
 
     public ManagementServiceImpl(int port) throws RemoteException {
         super(port);
-        exService = Executors.newFixedThreadPool(12);
     }
 
     Election getElection() {
@@ -38,7 +36,6 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     public ManagementServiceImpl(Election electionState) throws RemoteException {
         this.election = electionState;
-        exService = Executors.newFixedThreadPool(12);
     }
 
     @Override
@@ -52,14 +49,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     @Override
     public ElectionState getElectionState() throws RemoteException, ServiceException {
-        Future<ElectionState> future = exService.submit(() -> election.getElectionState());
-        ElectionState state;
-        try {
-            state = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ServiceException();
-        }
-        return state;
+        return election.getElectionState();
     }
 
     @Override
