@@ -1,7 +1,6 @@
 package Elections.server.ServiceImpl;
 
 import Elections.Models.PoliticalParty;
-import Elections.Models.Province;
 import Elections.Models.Vote;
 import javafx.util.Pair;
 import org.junit.Before;

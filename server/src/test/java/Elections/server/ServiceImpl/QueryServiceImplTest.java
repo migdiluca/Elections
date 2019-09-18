@@ -8,16 +8,13 @@ import Elections.Models.Province;
 import Elections.Models.Vote;
 import Elections.QueryService;
 import javafx.util.Pair;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 import static Elections.Models.PoliticalParty.*;
 import static Elections.Models.Province.JUNGLE;
@@ -28,8 +25,6 @@ public class QueryServiceImplTest {
     private QueryService consultingServiceNotStarted;
     private QueryService consultingServiceRunning;
     private QueryService consultingServiceFinished;
-
-    private static ExecutorService service;
 
     private List<Pair<BigDecimal, PoliticalParty>> nationalList;
     private Map<Province, List<Pair<BigDecimal, PoliticalParty>>> mapProvince;
@@ -111,128 +106,99 @@ public class QueryServiceImplTest {
             consultingServiceRunning = new QueryServiceImpl(electionRunning);
             consultingServiceFinished = new QueryServiceImpl(electionFinished);
 
-            service = Executors.newFixedThreadPool(200);
 
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
-    @After
-    public final void after() {
-        service.shutdownNow();
-    }
-
     @Test
     public void checkResultNationalTest() {
-        Runnable task = (() -> {
-            try {
-                consultingServiceNotStarted.checkResultNational();
-                fail();
-            } catch (ElectionStateException | RemoteException ignore) {
-            }
-            try {
-                List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultNational();
-                assertEquals(result.get(0).getValue(), BUFFALO);
-                assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-                assertEquals(result.get(1).getValue(), MONKEY);
-                assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-                assertEquals(result.get(2).getValue(), OWL);
-                assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-
-                assertTrue(consultingServiceFinished.checkResultNational().containsAll(nationalList));
-
-            } catch (ElectionStateException | RemoteException e) {
-                fail();
-            }
-
-        });
         try {
-            service.submit(task).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            consultingServiceNotStarted.checkResultNational();
+            fail();
+        } catch (ElectionStateException | RemoteException ignore) {
+        }
+        try {
+            List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultNational();
+            assertEquals(result.get(0).getValue(), BUFFALO);
+            assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+            assertEquals(result.get(1).getValue(), MONKEY);
+            assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+            assertEquals(result.get(2).getValue(), OWL);
+            assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+
+            assertTrue(consultingServiceFinished.checkResultNational().containsAll(nationalList));
+
+        } catch (ElectionStateException | RemoteException e) {
+            fail();
         }
     }
 
     @Test
     public void checkResultProvinceTest() {
-        Runnable task = (() -> {
-            try {
-                consultingServiceNotStarted.checkResultProvince(JUNGLE);
-                fail();
-            } catch (ElectionStateException | RemoteException ignore) {
-            }
-
-            try {
-                List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultProvince(JUNGLE);
-                assertEquals(result.get(0).getValue(), BUFFALO);
-                assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-                assertEquals(result.get(1).getValue(), MONKEY);
-                assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-                assertEquals(result.get(2).getValue(), OWL);
-                assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-            } catch (ElectionStateException | RemoteException ignore) {
-            }
-
-
-            mapProvince.forEach((k, v) -> {
-                try {
-                    assertEquals(v, consultingServiceFinished.checkResultProvince(k));
-                } catch (RemoteException | ElectionStateException e) {
-                    e.printStackTrace();
-                }
-            });
-        });
         try {
-            service.submit(task).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            consultingServiceNotStarted.checkResultProvince(JUNGLE);
+            fail();
+        } catch (ElectionStateException | RemoteException ignore) {
         }
+
+        try {
+            List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultProvince(JUNGLE);
+            assertEquals(result.get(0).getValue(), BUFFALO);
+            assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+            assertEquals(result.get(1).getValue(), MONKEY);
+            assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+            assertEquals(result.get(2).getValue(), OWL);
+            assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+        } catch (ElectionStateException | RemoteException ignore) {
+        }
+
+
+        mapProvince.forEach((k, v) -> {
+            try {
+                assertEquals(v, consultingServiceFinished.checkResultProvince(k));
+            } catch (RemoteException | ElectionStateException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 
     @Test
     public void checkResultDeskTest() {
-        Runnable task = (() -> {
-            try {
-                consultingServiceNotStarted.checkResultDesk(1);
-                fail();
-            } catch (ElectionStateException | RemoteException ignore) {
-            }
-
-            try {
-                List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultDesk(1);
-                assertEquals(result.get(0).getValue(), BUFFALO);
-                assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-                assertEquals(result.get(1).getValue(), MONKEY);
-                assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-
-                assertEquals(result.get(2).getValue(), OWL);
-                assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-            } catch (ElectionStateException | RemoteException ignore) {
-            }
-
-
-            mapDesk.forEach((k, v) -> {
-                try {
-                    assertEquals(v, consultingServiceFinished.checkResultDesk(k));
-                } catch (RemoteException | ElectionStateException e) {
-                    e.printStackTrace();
-                }
-            });
-
-
-        });
         try {
-            service.submit(task).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            consultingServiceNotStarted.checkResultDesk(1);
+            fail();
+        } catch (ElectionStateException | RemoteException ignore) {
         }
+
+        try {
+            List<Pair<BigDecimal, PoliticalParty>> result = consultingServiceRunning.checkResultDesk(1);
+            assertEquals(result.get(0).getValue(), BUFFALO);
+            assertEquals(result.get(0).getKey(), new BigDecimal(60.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+            assertEquals(result.get(1).getValue(), MONKEY);
+            assertEquals(result.get(1).getKey(), new BigDecimal(30.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+
+            assertEquals(result.get(2).getValue(), OWL);
+            assertEquals(result.get(2).getKey(), new BigDecimal(10.00).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+        } catch (ElectionStateException | RemoteException ignore) {
+        }
+
+
+        mapDesk.forEach((k, v) -> {
+            try {
+                assertEquals(v, consultingServiceFinished.checkResultDesk(k));
+            } catch (RemoteException | ElectionStateException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 
