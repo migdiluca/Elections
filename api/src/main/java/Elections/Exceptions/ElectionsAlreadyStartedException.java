@@ -1,9 +1,9 @@
 package Elections.Exceptions;
 
-public class ElectionsAlreadyStartedException extends ElectionStateException{
+public class ElectionsAlreadyStartedException extends ElectionStateException {
 
     public ElectionsAlreadyStartedException(){
-        super();
+        super("Elections have already started");
     }
 
 }

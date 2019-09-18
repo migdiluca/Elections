@@ -5,9 +5,9 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.IOException;
 
-public class CmdParserUtils {
+class CmdParserUtils {
 
-    public static void init(final String[] args, Object o) throws IOException {
+    static void init(final String[] args, Object o) throws IOException {
         final CmdLineParser parser = new CmdLineParser(o);
         if (args.length < 1) {
             parser.printUsage(System.err);
@@ -15,8 +15,7 @@ public class CmdParserUtils {
         }
         try {
             parser.parseArgument(args);
-        } catch (CmdLineException e)
-        {
+        } catch (CmdLineException e) {
             System.out.println(e.getMessage());
             parser.printUsage(System.err);
             System.exit(1);

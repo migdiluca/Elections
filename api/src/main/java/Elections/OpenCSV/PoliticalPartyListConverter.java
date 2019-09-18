@@ -1,7 +1,6 @@
-package CSVUtils;
+package Elections.OpenCSV;
 
 import Elections.Models.PoliticalParty;
-import Elections.Models.Province;
 import com.opencsv.bean.AbstractBeanField;
 import com.opencsv.exceptions.CsvConstraintViolationException;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;

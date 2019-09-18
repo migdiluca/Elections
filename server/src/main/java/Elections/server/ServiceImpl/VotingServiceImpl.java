@@ -1,23 +1,69 @@
 package Elections.server.ServiceImpl;
 
-import Elections.AdministrationService;
+import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
+import Elections.Exceptions.ElectionsNotStartedException;
+import Elections.FiscalCallBack;
+import Elections.Models.ElectionState;
 import Elections.Models.Vote;
 import Elections.VotingService;
+import Elections.server.Server;
+import Elections.Models.Pair;;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
 
-    private ElectionPOJO electionState;
+    private static Logger logger = LoggerFactory.getLogger(Server.class);
+    private Election electionState;
 
-    public VotingServiceImpl(ElectionPOJO electionState) throws RemoteException {
+    public VotingServiceImpl(Election electionState) throws RemoteException {
         this.electionState = electionState;
     }
 
     @Override
-    public void vote(Vote vote) throws ElectionStateException {
+    public void vote(List<Vote> votes) throws ElectionStateException, RemoteException {
+        if (electionState.getElectionState().equals(ElectionState.FINISHED) ||
+                electionState.getElectionState().equals(ElectionState.CALCULATING)) {
+            throw new AlreadyFinishedElectionException();
+        } else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
+            throw new ElectionsNotStartedException();
+        }
+        votes.forEach(vote -> {
+            electionState.addToVoteList(vote);
+        });
 
+        votes.forEach(this::notifyVoteToClients);
+    }
+
+    @Override
+    public void vote(Vote vote) throws ElectionStateException, RemoteException {
+        if (electionState.getElectionState().equals(ElectionState.FINISHED) ||
+                electionState.getElectionState().equals(ElectionState.CALCULATING)) {
+            throw new AlreadyFinishedElectionException();
+        } else if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
+            throw new ElectionsNotStartedException();
+        }
+        electionState.addToVoteList(vote);
+        notifyVoteToClients(vote);
+    }
+
+    private void notifyVoteToClients(Vote vote) {
+        vote.getPreferredParties().forEach(politicalParty -> {
+            List<FiscalCallBack> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getDesk()));
+            if (clientsToNotify != null) {
+                clientsToNotify.forEach(inspectionClient -> {
+                    try {
+                        inspectionClient.notifyVote();
+                    } catch (RemoteException e) {
+                        logger.error("Remote exception while notifying client");
+                    }
+                });
+            }
+        });
     }
 }
