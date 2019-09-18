@@ -24,7 +24,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     private Election election;
 
-    private final Object mutex = "calculating results";
+    private final Object mutexElectionState = "Election state mutex";
 
     public ManagementServiceImpl(int port) throws RemoteException {
         super(port);
@@ -40,11 +40,13 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     @Override
     public synchronized void openElections() throws ElectionStateException, RemoteException {
-        if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING))
-            throw new AlreadyFinishedElectionException();
-        if(election.getElectionState().equals(ElectionState.RUNNING))
-            throw new ElectionsAlreadyStartedException();
-        election.setElectionState(ElectionState.RUNNING);
+        synchronized (mutexElectionState) {
+            if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING))
+                throw new AlreadyFinishedElectionException();
+            if(election.getElectionState().equals(ElectionState.RUNNING))
+                throw new ElectionsAlreadyStartedException();
+            election.setElectionState(ElectionState.RUNNING);
+        }
     }
 
     @Override
@@ -54,7 +56,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     @Override
     public void finishElections() throws ElectionStateException, RemoteException {
-        synchronized (mutex) {
+        synchronized (mutexElectionState) {
             if (election.getElectionState().equals(ElectionState.NOT_STARTED))
                 throw new ElectionsNotStartedException();
             if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING)) {
