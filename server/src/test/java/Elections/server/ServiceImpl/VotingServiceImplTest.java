@@ -5,7 +5,6 @@ import Elections.Exceptions.ElectionStateException;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Vote;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,9 +12,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static Elections.Models.PoliticalParty.*;
 import static Elections.Models.Province.JUNGLE;
@@ -27,7 +23,6 @@ public class VotingServiceImplTest {
 
     private VotingServiceImpl votingServiceRunning;
     private VotingServiceImpl votingServiceNotStarted;
-    private static ExecutorService service;
     private Election electionRunning;
     private List<Vote> votes;
 
@@ -41,7 +36,6 @@ public class VotingServiceImplTest {
             Election electionNotStarted = new Election();
             votingServiceRunning = new VotingServiceImpl(electionRunning);
             votingServiceNotStarted = new VotingServiceImpl(electionNotStarted);
-            service = Executors.newFixedThreadPool(200);
             votes = new ArrayList<>();
 
 
@@ -77,15 +71,8 @@ public class VotingServiceImplTest {
             System.out.println("remote exception error");
         }
     }
-
-    @After
-    public final void after() {
-        service.shutdownNow();
-    }
-
     @Test
     public void voteTest() {
-        Runnable task = (() -> {
             try {
                 votingServiceNotStarted.vote(votes);
                 fail();
@@ -96,11 +83,6 @@ public class VotingServiceImplTest {
                 fail();
             }
             assertEquals(votes, electionRunning.getVotingList());
-        });
-        try {
-            service.submit(task).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+
     }
 }
