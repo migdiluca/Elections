@@ -3,6 +3,7 @@ package Elections.server.ServiceImpl;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Vote;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import javafx.util.Pair;
 
 import java.math.BigDecimal;
@@ -146,7 +147,7 @@ public class VotingSystems {
         // We compare first by amount of votes, then by party name(because they need to be distinguishable)
         Comparator<Pair<PoliticalParty, VoteList>> comp = Comparator
                 .comparing((Function<Pair<PoliticalParty, VoteList>, VoteList>) Pair::getValue, Comparator.comparingDouble(VoteList::getVotes))
-                .thenComparing(Pair::getKey);
+                .thenComparing(Collections.reverseOrder(Comparator.comparing(o -> o.getKey().name())));
 
         SortedSet<Pair<PoliticalParty, VoteList>> set = new TreeSet<>(comp);
         // we fill the set with VoteList for all candidate
@@ -175,14 +176,11 @@ public class VotingSystems {
     private void stVoteProvicialLevelREC(Set<Pair<PoliticalParty, VoteList>> masterSet, Set<PoliticalParty> stillCompeting, int availableSeats, double threshold, List<Pair<PoliticalParty, VoteList>> winnersSet) {
         // stillCompeting list should always contain candidates that did not won nor where eliminated
         availableSeats -= checkForWinners(masterSet, threshold, stillCompeting, winnersSet);
+
         // We ckeck that there still are candidates competing
         Supplier<Stream<Pair<PoliticalParty, VoteList>>> supplier = () -> masterSet.stream()
                 .filter(c -> stillCompeting.contains(c.getKey()) && c.getValue().size() > 0); // c.getValue().size() > 0 makes the difference
         long stillCompetingCount = supplier.get().count();
-        if (stillCompetingCount < availableSeats) {
-            // There are less candidates than seats.
-            System.out.println("There is no way to determine a winner between the lasts, they all are in the exact same situation");
-        }
         if (stillCompetingCount <= availableSeats) {
             // There are less or equal candidates compared to seats.
             // We force this lasts candidates to be winners even thought they do not meet the threshold
@@ -197,16 +195,39 @@ public class VotingSystems {
             return;
         } else {
             // We did not find enough winners, we have to eliminate loosers and distribute their votes
-            eliminateLooser(masterSet, stillCompeting, threshold);
+            List<Pair<PoliticalParty, VoteList>> eliminated = eliminateLooser(masterSet, stillCompeting, threshold);
+            List<Pair<PoliticalParty, VoteList>> stillCompetingFiltered = supplier.get().collect(Collectors.toList());
+            if (stillCompetingFiltered.size() < availableSeats) {
+                // We just deleted more candidates than needed to determine a winner
+                // so we need to undo a bit to determine who will win
+                // First we add all candidates who are still competing to the winners list
+                for (Pair<PoliticalParty, VoteList> candidate : masterSet) {
+                    if (stillCompetingFiltered.contains(candidate)) {
+                        winnersSet.add(candidate);
+                        stillCompeting.remove(candidate.getKey());
+                        availableSeats--;
+                    }
+                }
+                // Then we order the list of eliminated candidates alphabetically and add them
+                // to the winners list until all seats are filled
+                // they  have already been added removed from the stillCompeting set
+                eliminated.sort(Comparator.comparing(o -> o.getKey().name()));
+                winnersSet.addAll(eliminated.subList(0, availableSeats));
+                return;
+            }
         }
         stVoteProvicialLevelREC(masterSet, stillCompeting, availableSeats, threshold, winnersSet);
     }
 
-    private void eliminateLooser(Set<Pair<PoliticalParty, VoteList>> masterSet, Set<PoliticalParty> stillCompeting, double threshold) {
-        Map<PoliticalParty, VoteList> buffer = new HashMap<>(); // buffer to transfer left overs at the end of this method
+    private List<Pair<PoliticalParty, VoteList>> eliminateLooser(Set<Pair<PoliticalParty, VoteList>> masterSet, Set<PoliticalParty> stillCompeting, double threshold) {
+        // buffer to keep track of eliminated candidates
+        List<Pair<PoliticalParty, VoteList>> eliminated = new ArrayList<>();
+        // buffer to transfer left overs at the end of this method
+        Map<PoliticalParty, VoteList> buffer = new HashMap<>();
+        // init buffer
         for (PoliticalParty pp : PoliticalParty.values()) {
             buffer.put(pp, new VoteList());
-        } // init buffer
+        }
         // we sort the list to attack the lowest candidates first
         List<Pair<PoliticalParty, VoteList>> sorted = masterSet.stream()
                 .sorted(Comparator.comparingDouble(o -> o.getValue().votes))
@@ -220,10 +241,11 @@ public class VotingSystems {
                 // if this happens, it means that we have already eliminated all the loosers
                 // we distribute left overs and leave
                 redistributeVotes(buffer, masterSet);
-                return;
+                return eliminated;
             }
-            // we elominate the looser
+            // we eliminate the looser
             stillCompeting.remove(candidate.getKey());
+            eliminated.add(candidate);
             // we will give this votes a weight of 1
             bufferLeftoverVotes(candidate, buffer, 1.0, stillCompeting);
             smallestVotes = newSmallestVotes;
@@ -231,6 +253,7 @@ public class VotingSystems {
         // we do not redistributeVotes(buffer, masterSet) because if we reach here
         // it means that smallestVotes was always == newSmallestVotes
         // which means that parties had the same amount of votes
+        return eliminated;
     }
 
     private int checkForWinners(Set<Pair<PoliticalParty, VoteList>> masterSet, double threshold, Set<PoliticalParty> stillCompeting, List<Pair<PoliticalParty, VoteList>> winnersSet) {
@@ -385,5 +408,19 @@ public class VotingSystems {
         for (Province prov : Province.values()) {
             System.out.println(vs.stVoteProvicialLevel(prov));
         }
+        votes = new ArrayList<>();
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.BUFFALO), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.BUFFALO), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.GORILLA), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.GORILLA), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.WHITE_GORILLA), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.JACKALOPE), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.LEOPARD), Province.JUNGLE));
+        votes.add(new Vote(1, Arrays.asList(PoliticalParty.MONKEY), Province.JUNGLE));
+
+        Collections.shuffle(votes);
+        vs = new VotingSystems(votes);
+        List<Pair<BigDecimal, PoliticalParty>> resp = vs.stVoteProvicialLevel(Province.JUNGLE);
+        resp.forEach( c -> System.out.println(c.getKey() + ";" + c.getValue()));
     }
 }
