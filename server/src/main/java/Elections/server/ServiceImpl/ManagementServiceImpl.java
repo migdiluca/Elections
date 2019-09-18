@@ -32,7 +32,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
     }
 
     @Override
-    public synchronized void openElections() throws ElectionStateException, RemoteException {
+    public void openElections() throws ElectionStateException, RemoteException {
         synchronized (mutexElectionState) {
             if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING))
                 throw new AlreadyFinishedElectionException();
