@@ -19,6 +19,7 @@ public interface FiscalCallBack extends Remote {
 
     /**
      * Notifies an error
+     * @param electionState the state of the election
      */
     void submitError(ElectionState electionState) throws RemoteException;
 }

@@ -19,10 +19,6 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
 
     private final Object mutexElectionState = "Election state mutex" ;
 
-    public ManagementServiceImpl(int port) throws RemoteException {
-        super(port);
-    }
-
     Election getElection() {
         return election;
     }

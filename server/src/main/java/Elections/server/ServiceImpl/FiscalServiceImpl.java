@@ -44,13 +44,6 @@ public class FiscalServiceImpl extends UnicastRemoteObject implements FiscalServ
             });
             electionState.getFiscalClients().computeIfAbsent(votePair, clientsList -> new ArrayList<>()).add(fiscalCallBack);
 
-//            if (electionState.getFiscalClients().containsKey(votePair)) {
-//                electionState.getFiscalClients().get(votePair).add(fiscalCallBack);
-//            } else {
-//                List<FiscalCallBack> list = new ArrayList<>();
-//                list.add(fiscalCallBack);
-//                electionState.getFiscalClients().put(votePair, list);
-//            }
         }
 
         logger.info("A fiscal has been registered in desk " + desk + " for party " + party.name());
