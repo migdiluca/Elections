@@ -83,12 +83,7 @@ public class VoteClient {
     }
 
     private boolean uploadVotes(VotingService vs, List<Vote> votes) {
-        int bulkPacketsAmount = (int) Math.ceil(votes.size() / VotingService.bulkSize);
         try {
-//            for (int i = 0; i < bulkPacketsAmount; i++) {
-//                List<Vote> sublist = new ArrayList<>(votes.subList(i * bulkPacketsAmount, i * bulkPacketsAmount + VotingService.bulkSize));
-//                vs.vote(sublist);
-//            }
             for (Vote vote:votes) {
                 vs.vote(vote);
             }
