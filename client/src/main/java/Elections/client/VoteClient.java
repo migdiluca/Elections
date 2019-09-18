@@ -84,7 +84,7 @@ public class VoteClient {
 
     private boolean uploadVotes(VotingService vs, List<Vote> votes) {
         try {
-            for (Vote vote:votes) {
+            for (Vote vote : votes) {
                 vs.vote(vote);
             }
         } catch (RemoteException e) {

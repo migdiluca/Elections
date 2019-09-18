@@ -1,6 +1,5 @@
 package Elections;
 
-
 import Elections.Exceptions.AlreadyFinishedElectionException;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsAlreadyStartedException;
@@ -11,10 +10,11 @@ import java.rmi.RemoteException;
 
 public interface FiscalService extends Remote {
 
-    String SERVICE_NAME = "inspection_service";
+    String SERVICE_NAME = "inspection_service" ;
 
     /**
      * If already open
+     *
      * @throws ElectionsAlreadyStartedException if elections have started
      * @throws AlreadyFinishedElectionException if elections have finished
      */

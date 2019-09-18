@@ -9,7 +9,6 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -110,11 +109,11 @@ public class FiscalClient implements FiscalCallBack {
     @Override
     public void endClient() throws RemoteException {
         System.out.println("Elections finished");
-        try{
+        try {
             String[] serverAddr = getIp().split(":", -1);
             LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1])).unbind(FiscalService.SERVICE_NAME);
             UnicastRemoteObject.unexportObject(this, true);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println("There was an exception while ending the client");
             System.exit(1);
         }
@@ -122,10 +121,9 @@ public class FiscalClient implements FiscalCallBack {
 
     @Override
     public void submitError(ElectionState electionState) throws RemoteException {
-        if(electionState.equals(ElectionState.RUNNING)) {
+        if (electionState.equals(ElectionState.RUNNING)) {
             System.out.println("Elections already started");
-        }
-        else if(electionState.equals(ElectionState.FINISHED)) {
+        } else if (electionState.equals(ElectionState.FINISHED)) {
             System.out.println("Elections already finished");
         }
         System.exit(1);

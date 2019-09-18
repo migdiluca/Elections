@@ -12,10 +12,6 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class QueryServiceImpl extends UnicastRemoteObject implements QueryService {
 

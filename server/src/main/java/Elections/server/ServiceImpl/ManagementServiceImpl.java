@@ -6,25 +6,18 @@ import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Pair;;
-
-
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class ManagementServiceImpl extends UnicastRemoteObject implements ManagementService {
 
     private Election election;
 
-    private final Object mutexElectionState = "Election state mutex";
+    private final Object mutexElectionState = "Election state mutex" ;
 
     public ManagementServiceImpl(int port) throws RemoteException {
         super(port);
@@ -43,7 +36,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
         synchronized (mutexElectionState) {
             if (election.getElectionState().equals(ElectionState.FINISHED) || election.getElectionState().equals(ElectionState.CALCULATING))
                 throw new AlreadyFinishedElectionException();
-            if(election.getElectionState().equals(ElectionState.RUNNING))
+            if (election.getElectionState().equals(ElectionState.RUNNING))
                 throw new ElectionsAlreadyStartedException();
             election.setElectionState(ElectionState.RUNNING);
         }

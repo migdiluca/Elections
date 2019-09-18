@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import java.util.concurrent.*;
 
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
 
@@ -57,7 +56,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     private void notifyVoteToClients(Vote vote) {
         vote.getPreferredParties().forEach(politicalParty -> {
             List<FiscalCallBack> clientsToNotify = electionState.getFiscalClients().get(new Pair<>(politicalParty, vote.getDesk()));
-            if(clientsToNotify != null) {
+            if (clientsToNotify != null) {
                 clientsToNotify.forEach(inspectionClient -> {
                     try {
                         inspectionClient.notifyVote();

@@ -165,7 +165,7 @@ public class VotingSystems {
         // We return the winners with with the FRACTION of votes they won over the total amount of votes
         return winnersList.stream()
                 .sorted(comp.reversed())
-                .map((Pair<PoliticalParty, VoteList> p) -> new Pair<>(new BigDecimal((p.getValue().votes / provinceCount) * 100).setScale(2,BigDecimal.ROUND_DOWN), p.getKey()))
+                .map((Pair<PoliticalParty, VoteList> p) -> new Pair<>(new BigDecimal((p.getValue().votes / provinceCount) * 100).setScale(2, BigDecimal.ROUND_DOWN), p.getKey()))
                 .collect(Collectors.toList());
     }
 
@@ -377,7 +377,7 @@ public class VotingSystems {
         for (int i = 0; i < VOTES_COUNT; i++) {
             //Collections.shuffle(parties);
             num = rand.nextInt(7); // tocando esto podemos hacer la votación más o menos parcial/random
-            votes.add(new Vote(DESK, new ArrayList<>(parties.subList(num, num + 3)) , Province.values()[rand.nextInt(3)]));
+            votes.add(new Vote(DESK, new ArrayList<>(parties.subList(num, num + 3)), Province.values()[rand.nextInt(3)]));
         }
         VotingSystems vs = new VotingSystems(votes);
         for (Province prov : Province.values()) {
