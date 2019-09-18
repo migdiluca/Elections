@@ -55,8 +55,6 @@ public class VotingSystems {
         Retorna la cantidad de votos que fueron transferidos
      */
     private int transferVotesAV(Map<PoliticalParty, List<Vote>> masterMap, List<PoliticalParty> eliminatedParties, List<Vote> transferableVotes) {
-//        transferableVotes.forEach(vote -> doTransferVoteAV(masterMap, eliminatedParties, vote));
-        // no uso java 8 ya que no deja incluir variables no final en sus bloques de codigo {}
         int count = 0;
         for (Vote vote : transferableVotes) {
             if (doTransferVoteAV(masterMap, eliminatedParties, vote)) {
@@ -87,11 +85,13 @@ public class VotingSystems {
         losers.forEach(l -> masterMap.remove(l.getKey()));
         losers.forEach(l -> eliminatedParties.add(l.getKey()));
 
-        int trasnferredVotes = 0;
+        int losersTrasnferredVotes = 0;
+        int losersTotalVotes = 0;
         for (Map.Entry<PoliticalParty, List<Vote>> e : losers) {
-            trasnferredVotes += transferVotesAV(masterMap, eliminatedParties, e.getValue());
+            losersTotalVotes += e.getValue().size();
+            losersTrasnferredVotes += transferVotesAV(masterMap, eliminatedParties, e.getValue());
         }
-        int votesLost = loser.getValue().size() - trasnferredVotes;
+        int votesLost = losersTotalVotes - losersTrasnferredVotes;
         return alternativeVoteNationalLevelREC(masterMap, eliminatedParties, total - votesLost);
     }
 
