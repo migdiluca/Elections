@@ -10,8 +10,7 @@
 	</appender>
 
 	<root>
-		<level value="INFO" />
-		<!--para prenderlo cambiar a DEBUG/ INFO/ WARN ... etc-->
+		<level value="OFF" />
 		<appender-ref ref="console" />
 	</root>
 
