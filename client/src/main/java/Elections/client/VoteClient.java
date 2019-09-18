@@ -57,7 +57,6 @@ public class VoteClient {
             votes = CSVUtil.CSVRead(Paths.get(client.getVotesFileName()));
         } catch (Exception e) {
             System.err.println("An error has been encountered while reading votes file");
-            System.err.println("Exiting...");
             System.exit(1);
         }
 
@@ -88,10 +87,9 @@ public class VoteClient {
                 vs.vote(vote);
             }
         } catch (RemoteException e) {
-            System.err.println("There was an error uploading the votes" + VotingService.SERVICE_NAME);
+            System.err.println("There was an error uploading the votes: " + VotingService.SERVICE_NAME);
             return false;
         } catch (ElectionStateException e) {
-            System.err.println("Elections are not open: " + VotingService.SERVICE_NAME);
             System.err.println(e.getMessage());
             return false;
         }

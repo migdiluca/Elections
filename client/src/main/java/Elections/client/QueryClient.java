@@ -19,6 +19,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class QueryClient {
 
@@ -111,12 +112,25 @@ public class QueryClient {
             System.out.println(e.getMessage());
             return;
         }
-        System.out.println(results);
-        try {
-            CSVUtil.CSVWrite(Paths.get(client.getResultFileName()), results);
-        } catch (IOException e) {
-            System.out.println("There was an error while writing results to file: " + client.getResultFileName());
-            System.exit(1);
+
+        if (results != null && results.size() > 0) {
+            // The winner is always the first one on the list.
+            Pair<BigDecimal, PoliticalParty> winner = results.get(0);
+            // If there was a draw we get a list with the parties.
+            List<Pair<BigDecimal, PoliticalParty>> winners = results.stream().filter(p -> p.getKey().compareTo(winner.getKey()) == 0).collect(Collectors.toList());
+            StringBuilder sb = new StringBuilder();
+            winners.forEach(p -> sb.append(p.getValue().name()).append(", "));
+            sb.deleteCharAt(sb.lastIndexOf(","));
+            sb.append("won the election");
+            System.out.println(sb);
+            try {
+                CSVUtil.CSVWrite(Paths.get(client.getResultFileName()), results);
+            } catch (IOException e) {
+                System.out.println("There was an error while writing results to file: " + client.getResultFileName());
+                System.exit(1);
+            }
+        } else {
+            System.out.println("Table " + client.getDesk().get() + " has no votes.");
         }
 
     }

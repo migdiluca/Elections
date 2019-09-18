@@ -51,7 +51,6 @@ public class QueryServiceImpl extends UnicastRemoteObject implements QueryServic
         }
     }
 
-
     private List<Pair<BigDecimal, PoliticalParty>> notCompletedResults() throws RemoteException, ElectionStateException {
         if (electionState.getElectionState().equals(ElectionState.NOT_STARTED)) {
             throw new ElectionsNotStartedException();
