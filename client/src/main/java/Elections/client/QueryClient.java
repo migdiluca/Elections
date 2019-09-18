@@ -130,8 +130,13 @@ public class QueryClient {
                 System.exit(1);
             }
         } else {
-            System.out.println("No votos found for query.");
+            if (client.getDesk().isPresent()) {
+                System.out.println("Table " + client.getDesk().get() + " has no votes.");
+            } else if (client.getState().isPresent()) {
+                System.out.println("State " + client.getState().get() + " has no votes.");
+            } else {
+                System.out.println("No votes found for query.");
+            }
         }
-
     }
 }
