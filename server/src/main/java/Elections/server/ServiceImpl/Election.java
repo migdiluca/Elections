@@ -5,7 +5,7 @@ import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Vote;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 
 import java.math.BigDecimal;
 import java.util.*;

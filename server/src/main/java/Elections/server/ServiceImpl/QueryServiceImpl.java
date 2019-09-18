@@ -6,7 +6,7 @@ import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;

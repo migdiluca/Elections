@@ -6,7 +6,7 @@ import Elections.QueryService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 

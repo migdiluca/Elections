@@ -7,7 +7,7 @@ import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Vote;
 import Elections.QueryService;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 import org.junit.Before;
 import org.junit.Test;
 

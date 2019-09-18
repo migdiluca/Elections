@@ -3,7 +3,7 @@ package CSVUtils;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Vote;
 import com.opencsv.bean.*;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,9 +19,9 @@ public class CSVUtil {
     /*
         Returns true if no IOExceptin, otherwise false
      */
-    private static void writePair(Pair<BigDecimal, PoliticalParty> pair, Writer writer) throws RuntimeException {
+    private static void writePair(Pair<BigDecimal, PoliticalParty> Pair, Writer writer) throws RuntimeException {
         try {
-            writer.write(pair.getKey().toString() + "%;" + pair.getValue().name() + "\n");
+            writer.write(Pair.getKey().toString() + "%;" + Pair.getValue().name() + "\n");
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -34,7 +34,7 @@ public class CSVUtil {
         Writer writer = new FileWriter(path.toString());
         writer.write("Porcentaje;Partido\n");
         try {
-            result.forEach(pair -> writePair(pair, writer));
+            result.forEach(Pair -> writePair(Pair, writer));
             writer.close();
         } catch (RuntimeException ex) {
             throw new IOException();

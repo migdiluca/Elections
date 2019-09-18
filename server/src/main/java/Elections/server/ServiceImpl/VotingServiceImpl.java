@@ -8,7 +8,7 @@ import Elections.Models.ElectionState;
 import Elections.Models.Vote;
 import Elections.VotingService;
 import Elections.server.Server;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
             throw new ElectionsNotStartedException();
         }
         electionState.addToVoteList(vote);
-
+        logger.info("hasta ahora" + electionState.getVotingList().size());
         notifyVoteToClients(vote);
     }
 

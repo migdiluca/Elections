@@ -5,7 +5,7 @@ import Elections.ManagementService;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 
 
 import java.math.BigDecimal;
@@ -80,7 +80,7 @@ public class ManagementServiceImpl extends UnicastRemoteObject implements Manage
     }
 
     private void notifyEndToClients() {
-        election.getFiscalClients().forEach((pair, clientList) -> clientList.forEach(client -> {
+        election.getFiscalClients().forEach((Pair, clientList) -> clientList.forEach(client -> {
             try {
                 client.endClient();
             } catch (RemoteException e) {

@@ -4,7 +4,7 @@ package Elections;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ElectionsNotStartedException;
 import Elections.Models.PoliticalParty;
-import javafx.util.Pair;
+import Elections.Models.Pair;
 import Elections.Models.Province;
 
 import java.math.BigDecimal;

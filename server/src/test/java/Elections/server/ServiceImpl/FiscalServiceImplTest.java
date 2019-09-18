@@ -5,7 +5,7 @@ import Elections.Exceptions.ElectionStateException;
 import Elections.FiscalCallBack;
 import Elections.Models.ElectionState;
 import Elections.Models.PoliticalParty;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,13 +58,13 @@ public class FiscalServiceImplTest {
             e.printStackTrace();
         }
 
-        Pair<PoliticalParty, Integer> pair1 = new Pair<>(PoliticalParty.BUFFALO, 1);
-        Pair<PoliticalParty, Integer> pair2 = new Pair<>(PoliticalParty.BUFFALO, 2);
+        Pair<PoliticalParty, Integer> Pair1 = new Pair<>(PoliticalParty.BUFFALO, 1);
+        Pair<PoliticalParty, Integer> Pair2 = new Pair<>(PoliticalParty.BUFFALO, 2);
 
-        if (election.getFiscalClients().containsKey(pair1)) {
-            assertEquals(fiscalCallBack, election.getFiscalClients().get(pair1).get(0));
+        if (election.getFiscalClients().containsKey(Pair1)) {
+            assertEquals(fiscalCallBack, election.getFiscalClients().get(Pair1).get(0));
         }
-        if (election.getFiscalClients().containsKey(pair2)) {
+        if (election.getFiscalClients().containsKey(Pair2)) {
             fail();
         }
     }
@@ -95,9 +95,9 @@ public class FiscalServiceImplTest {
 
         for (PoliticalParty pp : PoliticalParty.values()) {
             for (int i = 0; i < 20; i++) {
-                Pair<PoliticalParty, Integer> pair = new Pair<>(pp, i);
-                if (election.getFiscalClients().containsKey(pair)) {
-                    assertEquals(fiscalCallBack, election.getFiscalClients().get(pair).get(0));
+                Pair<PoliticalParty, Integer> Pair = new Pair<>(pp, i);
+                if (election.getFiscalClients().containsKey(Pair)) {
+                    assertEquals(fiscalCallBack, election.getFiscalClients().get(Pair).get(0));
                 }
             }
         }

@@ -3,11 +3,9 @@ package Elections.server.ServiceImpl;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Vote;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
