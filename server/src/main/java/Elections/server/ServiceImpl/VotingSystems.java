@@ -96,7 +96,7 @@ public class VotingSystems {
     }
 
     /*
-        returns the Pair (percentage of votes, political party) from the winner
+        returns the Pair(percentage of votes, political party) from the winner
     */
     List<Pair<BigDecimal, PoliticalParty>> alternativeVoteNationalLevel() {
         Map<PoliticalParty, List<Vote>> masterMap = votes.stream()
