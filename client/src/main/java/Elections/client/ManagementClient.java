@@ -59,11 +59,9 @@ public class ManagementClient {
             as = (ManagementService) registry.lookup(ManagementService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
-            System.out.println(e.getMessage());
             return;
         } catch (NotBoundException e) {
             System.out.println("There where problems finding the service needed service");
-            System.out.println(e.getMessage());
             return;
         }
         try {

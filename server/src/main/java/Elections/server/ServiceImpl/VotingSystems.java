@@ -3,12 +3,9 @@ package Elections.server.ServiceImpl;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
 import Elections.Models.Vote;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -21,7 +18,6 @@ public class VotingSystems {
     private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByPercentage = (a1, a2) -> a2.getKey().compareTo(a1.getKey());
     private final static Comparator<Pair<BigDecimal, PoliticalParty>> cmpByName = Comparator.comparing(p -> p.getValue().name());
     public final static Comparator<Pair<BigDecimal, PoliticalParty>> cmp = cmpByPercentage.thenComparing(cmpByName);
-    // o poner en la clase Election
 
     public VotingSystems(List<Vote> votes) {
         this.votes = votes;
@@ -86,14 +82,15 @@ public class VotingSystems {
                     e.getKey())).collect(Collectors.toList());
         }
         Map.Entry<PoliticalParty, List<Vote>> loser = sortedEntries.get(sortedEntries.size() - 1);
-        /* todo: el perdedor podria haber empatado con otro candidato -> alternativas:
-        1- random sacar a uno
-        2- sacar a los 2
-        3- algun tipo de decision sobre estadistica en las rondas anteriores
-        */
-        masterMap.remove(loser.getKey());
-        eliminatedParties.add(loser.getKey());
-        int trasnferredVotes = transferVotesAV(masterMap, eliminatedParties, loser.getValue());
+        List<Map.Entry<PoliticalParty, List<Vote>>> losers = sortedEntries.stream().filter(e -> e.getValue().size() == loser.getValue().size()).collect(Collectors.toList());
+
+        losers.forEach(l -> masterMap.remove(l.getKey()));
+        losers.forEach(l -> eliminatedParties.add(l.getKey()));
+
+        int trasnferredVotes = 0;
+        for (Map.Entry<PoliticalParty, List<Vote>> e : losers) {
+            trasnferredVotes += transferVotesAV(masterMap, eliminatedParties, e.getValue());
+        }
         int votesLost = loser.getValue().size() - trasnferredVotes;
         return alternativeVoteNationalLevelREC(masterMap, eliminatedParties, total - votesLost);
     }
@@ -168,7 +165,7 @@ public class VotingSystems {
         // We return the winners with with the FRACTION of votes they won over the total amount of votes
         return winnersList.stream()
                 .sorted(comp.reversed())
-                .map((Pair<PoliticalParty, VoteList> p) -> new Pair<>(new BigDecimal((p.getValue().votes / provinceCount) * 100).setScale(2,BigDecimal.ROUND_DOWN), p.getKey()))
+                .map((Pair<PoliticalParty, VoteList> p) -> new Pair<>(new BigDecimal((p.getValue().votes / provinceCount) * 100).setScale(2, BigDecimal.ROUND_DOWN), p.getKey()))
                 .collect(Collectors.toList());
     }
 
@@ -402,7 +399,7 @@ public class VotingSystems {
         for (int i = 0; i < VOTES_COUNT; i++) {
             //Collections.shuffle(parties);
             num = rand.nextInt(7); // tocando esto podemos hacer la votación más o menos parcial/random
-            votes.add(new Vote(DESK, new ArrayList<>(parties.subList(num, num + 3)) , Province.values()[rand.nextInt(3)]));
+            votes.add(new Vote(DESK, new ArrayList<>(parties.subList(num, num + 3)), Province.values()[rand.nextInt(3)]));
         }
         VotingSystems vs = new VotingSystems(votes);
         for (Province prov : Province.values()) {

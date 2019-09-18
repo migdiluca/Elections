@@ -1,12 +1,12 @@
 package Elections.client;
 
-import CSVUtils.CSVWrite;
+import CSVUtils.CSVUtil;
 import Elections.ManagementService;
 import Elections.QueryService;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.PoliticalParty;
 import Elections.Models.Province;
-import javafx.util.Pair;
+import Elections.Models.Pair;;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
@@ -19,6 +19,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class QueryClient {
 
@@ -31,7 +32,7 @@ public class QueryClient {
     private Integer desk;
 
     @Option(name = "-DoutPath", aliases = "--file", usage = "Fully qualified path and name of file to output results.", required = true)
-    private String votesFileName;
+    private String resultFileName;
 
     @Option(name = "-DserverAddress", aliases = "--server", usage = "Fully qualified ip and port where the query service is located.", required = true)
     public void setIp(String ip) throws CmdLineException {
@@ -61,12 +62,12 @@ public class QueryClient {
         this.desk = desk;
     }
 
-    public String getVotesFileName() {
-        return votesFileName;
+    public String getResultFileName() {
+        return resultFileName;
     }
 
-    public void setVotesFileName(String votesFileName) {
-        this.votesFileName = votesFileName;
+    public void setResultFileName(String resultFileName) {
+        this.resultFileName = resultFileName;
     }
 
     public static void main(String[] args) {
@@ -88,14 +89,14 @@ public class QueryClient {
             final Registry registry = LocateRegistry.getRegistry(arr[0], Integer.parseInt(arr[1]));
             cs = (QueryService) registry.lookup(QueryService.SERVICE_NAME);
         } catch (RemoteException e) {
-            System.out.println("There where problems finding the registry at ip: " + client.getIp());
+            System.out.println("There were problems finding the registry at ip: " + client.getIp());
             return;
         } catch (NotBoundException e) {
-            System.out.println("There where problems finding the service needed service ");
+            System.out.println("There were problems finding the service needed service ");
             return;
         }
 
-        List<Pair<BigDecimal, PoliticalParty>> results = null;
+        List<Pair<BigDecimal, PoliticalParty>> results;
         try {
             if (client.getDesk().isPresent()) {
                 results = cs.checkResultDesk(client.getDesk().get());
@@ -105,14 +106,32 @@ public class QueryClient {
                 results = cs.checkResultNational();
             }
         } catch (RemoteException e) {
-            System.out.println("There was an error retriving results from" + QueryService.SERVICE_NAME);
+            System.out.println("There was an error retrieving results from " + QueryService.SERVICE_NAME);
             return;
         } catch (ElectionStateException e) {
             System.out.println(e.getMessage());
             return;
         }
 
-        System.out.println(results);
-        CSVWrite.writeCsv(Paths.get(client.getVotesFileName()), results);
+        if (results != null && results.size() > 0) {
+            // The winner is always the first one on the list.
+            Pair<BigDecimal, PoliticalParty> winner = results.get(0);
+            // If there was a draw we get a list with the parties.
+            List<Pair<BigDecimal, PoliticalParty>> winners = results.stream().filter(p -> p.getKey().compareTo(winner.getKey()) == 0).collect(Collectors.toList());
+            StringBuilder sb = new StringBuilder();
+            winners.forEach(p -> sb.append(p.getValue().name()).append(", "));
+            sb.deleteCharAt(sb.lastIndexOf(","));
+            sb.append("won the election");
+            System.out.println(sb);
+            try {
+                CSVUtil.CSVWrite(Paths.get(client.getResultFileName()), results);
+            } catch (IOException e) {
+                System.out.println("There was an error while writing results to file: " + client.getResultFileName());
+                System.exit(1);
+            }
+        } else {
+            System.out.println("Table " + client.getDesk().get() + " has no votes.");
+        }
+
     }
 }

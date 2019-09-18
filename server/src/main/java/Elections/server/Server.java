@@ -14,9 +14,22 @@ import java.rmi.registry.Registry;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
-    private static final int port = 1099;
+    private static final int DEFUALT_PORT = 1099;
 
     public static void main(String[] args) throws RemoteException {
+        int port = DEFUALT_PORT;
+
+        if (args.length == 1) {
+            if (!args[0].matches("^[0-9]+$")) {
+                System.out.println("Invalid port number");
+                System.exit(1);
+            }
+            // If it matches regular expresion, it can be parsed to integer. But still we don't know if port is an available port or existant
+            port = Integer.parseInt(args[0]);
+        } else if (args.length > 1) {
+            System.out.println("Invalid arguments, only enter port number.\nIf not default port will be used");
+            System.exit(1);
+        }
 
         logger.info("Elections Server Starting ...");
 
@@ -34,6 +47,6 @@ public class Server {
         registry.rebind(FiscalService.SERVICE_NAME, is);
         registry.rebind(QueryService.SERVICE_NAME, cs);
 
-        System.out.println("Server up and running on port:" + port);
+        System.out.println("Server up and running on port: " + port);
     }
 }

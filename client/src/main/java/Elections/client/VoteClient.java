@@ -1,6 +1,6 @@
 package Elections.client;
 
-import CSVUtils.Data;
+import CSVUtils.CSVUtil;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Models.Vote;
 import Elections.VotingService;
@@ -52,8 +52,13 @@ public class VoteClient {
         }
         // if it gets here, than it is receiving the args correctly
         // getting the csv info
-        Data data = new Data(Paths.get(client.getVotesFileName()));
-        List<Vote> votes = new ArrayList<>(data.get());
+        List<Vote> votes = null;
+        try {
+            votes = CSVUtil.CSVRead(Paths.get(client.getVotesFileName()));
+        } catch (Exception e) {
+            System.err.println("An error has been encountered while reading votes file");
+            System.exit(1);
+        }
 
         // starting server connection
         String[] serverAddr = client.getIp().split(":", -1);
@@ -63,11 +68,9 @@ public class VoteClient {
             vs = (VotingService) registry.lookup(VotingService.SERVICE_NAME);
         } catch (RemoteException e) {
             System.err.println("There where problems finding the registry at ip: " + client.getIp());
-            System.err.println(e.getMessage());
             return;
         } catch (NotBoundException e) {
             System.err.println("There where problems finding the service needed service ");
-            System.err.println(e.getMessage());
             return;
         }
 
@@ -76,26 +79,20 @@ public class VoteClient {
         if (client.uploadVotes(vs, votes)) {
             System.out.println(votes.size() + " votes registered");
         }
-
     }
 
-    private boolean uploadVotes(VotingService vs, List<Vote> votes){
-        int bulkPacketsAmount = (int) Math.ceil(votes.size() / VotingService.bulkSize);
+    private boolean uploadVotes(VotingService vs, List<Vote> votes) {
         try {
-            for (int i = 0; i < bulkPacketsAmount; i++) {
-                List<Vote> sublist = new ArrayList<>(votes.subList(i * bulkPacketsAmount, i * bulkPacketsAmount + VotingService.bulkSize));
-                vs.vote(sublist);
+            for (Vote vote : votes) {
+                vs.vote(vote);
             }
         } catch (RemoteException e) {
-            System.err.println("There was an error uploading the votes" + VotingService.SERVICE_NAME);
-            System.err.println(e.getMessage());
+            System.err.println("There was an error uploading the votes: " + VotingService.SERVICE_NAME);
             return false;
         } catch (ElectionStateException e) {
-            System.err.println("Elections are not open: " + VotingService.SERVICE_NAME);
             System.err.println(e.getMessage());
             return false;
         }
-
         return true;
     }
 }

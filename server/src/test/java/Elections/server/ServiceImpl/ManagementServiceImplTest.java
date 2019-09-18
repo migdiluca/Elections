@@ -3,14 +3,10 @@ package Elections.server.ServiceImpl;
 import Elections.Exceptions.ElectionStateException;
 import Elections.Exceptions.ServiceException;
 import Elections.Models.ElectionState;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +16,6 @@ public class ManagementServiceImplTest {
     private ManagementServiceImpl administrationServiceRunning;
     private ManagementServiceImpl administrationServiceFinished;
 
-    private static ExecutorService service;
 
     @Before
     public void init() {
@@ -33,21 +28,14 @@ public class ManagementServiceImplTest {
             Election election2 = new Election();
             election2.setElectionState(ElectionState.RUNNING);
             administrationServiceRunning = new ManagementServiceImpl(election2);
-
-            service = Executors.newFixedThreadPool(2);
         } catch (RemoteException e) {
             System.out.println("remote exception error");
         }
     }
 
-    @After
-    public final void after() {
-        service.shutdownNow();
-    }
 
     @Test
     public void openElectionsTest() {
-        Runnable task = (() -> {
             try {
                 administrationService.openElections();
             } catch (ElectionStateException | RemoteException exception) {
@@ -59,12 +47,7 @@ public class ManagementServiceImplTest {
             } catch (ElectionStateException | RemoteException exception) {
                 assertEquals(administrationService.getElection().getElectionState(), ElectionState.RUNNING);
             }
-        });
-        try {
-            service.submit(task).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Test
@@ -80,7 +63,6 @@ public class ManagementServiceImplTest {
 
     @Test
     public void closeElectionsTest() {
-        Runnable task = (() -> {
             try{
                 administrationService.finishElections();
                 fail();
@@ -97,12 +79,5 @@ public class ManagementServiceImplTest {
             } catch (ElectionStateException | RemoteException ignore) {
                 fail();
             }
-
-        });
-        try {
-            service.submit(task).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
     }
 }

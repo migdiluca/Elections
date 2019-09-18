@@ -15,8 +15,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import static java.lang.System.exit;
-
 public class FiscalClient implements FiscalCallBack {
 
     private String ip;
@@ -61,7 +59,7 @@ public class FiscalClient implements FiscalCallBack {
             CmdParserUtils.init(args, client);
         } catch (IOException e) {
             System.out.println("There was a problem reading the arguments");
-            exit(1);
+            System.exit(1);
         }
 
         // Start the connection with the server
@@ -72,9 +70,11 @@ public class FiscalClient implements FiscalCallBack {
             is = (FiscalService) registry.lookup(FiscalService.SERVICE_NAME);
         } catch (NotBoundException e) {
             System.out.println("There where problems finding the service needed service");
+            System.exit(1);
             return;
         } catch (RemoteException e) {
             System.out.println("There where problems finding the registry at ip: " + client.getIp());
+            System.exit(1);
             return;
         }
 
@@ -83,7 +83,7 @@ public class FiscalClient implements FiscalCallBack {
             UnicastRemoteObject.exportObject(client, 0);
         } catch (RemoteException e) {
             System.out.println("There was a problem.");
-            return;
+            System.exit(1);
         }
 
         // register client callback function
@@ -91,10 +91,10 @@ public class FiscalClient implements FiscalCallBack {
             is.addInspector(client, client.getParty(), client.getDesk());
         } catch (RemoteException e) {
             System.out.println("Could not reach service");
-            return;
+            System.exit(1);
         } catch (ElectionStateException e) {
             System.out.println("Elections are closed or already started");
-            return;
+            System.exit(1);
         }
 
         // Correctly registered
@@ -109,17 +109,23 @@ public class FiscalClient implements FiscalCallBack {
     @Override
     public void endClient() throws RemoteException {
         System.out.println("Elections finished");
-        exit(0);
+        try {
+            String[] serverAddr = getIp().split(":", -1);
+            LocateRegistry.getRegistry(serverAddr[0], Integer.parseInt(serverAddr[1])).unbind(FiscalService.SERVICE_NAME);
+            UnicastRemoteObject.unexportObject(this, true);
+        } catch (Exception e) {
+            System.out.println("There was an exception while ending the client");
+            System.exit(1);
+        }
     }
 
     @Override
     public void submitError(ElectionState electionState) throws RemoteException {
-        if(electionState.equals(ElectionState.RUNNING)) {
+        if (electionState.equals(ElectionState.RUNNING)) {
             System.out.println("Elections already started");
-        }
-        else if(electionState.equals(ElectionState.FINISHED)) {
+        } else if (electionState.equals(ElectionState.FINISHED)) {
             System.out.println("Elections already finished");
         }
-        exit(1);
+        System.exit(1);
     }
 }
